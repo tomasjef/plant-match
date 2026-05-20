@@ -1,15 +1,15 @@
 <div class="app-page">
   <div class="app-container">
 
-  <%= link_to "← Find another match", find_plant_path, class: "back-link" %>
+  <%= link_to "← Back to matches", @back_to_matches_path, class: "back-link" %>
 
   <div class="row g-4 mt-3">
 
     <%# LEFT COLUMN — image + pills %>
     <div class="col-md-5">
       <div class="position-relative">
-        <% if @plant.image_url.present? %>
-          <%= image_tag @plant.image_url, class: "detail-image", alt: @plant.name %>
+        <% if (@plant.api_image_url.presence || @plant.image_url).present? %>
+          <%= image_tag @plant.api_image_url.presence || @plant.image_url, class: "detail-image", alt: @plant.display_name %>
         <% else %>
           <div class="plant-placeholder detail-image">
             Plant
@@ -22,20 +22,65 @@
       </div>
     </div>
 
-    <%# RIGHT COLUMN — name + button + description %>
-    <div class="col-md-7 ps-md-5 d-flex flex-column">
-      <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
-        <h1 class="page-title"><%= @plant.name %></h1>
-        <%= button_to save_plant_path(@plant), method: :post, class: "btn btn-soft-danger rounded-pill px-4 py-2" do %>
-          Save Plant
-        <% end %>
-      </div>
+    <div class="col-md-7 ps-md-5">
+      <div class="plant-detail-content">
+        <div class="plant-detail-header">
+          <div>
+            <h1 class="page-title"><%= @plant.display_name %></h1>
+            <% if @plant.scientific_name.present? %>
+              <p class="detail-scientific-name"><%= @plant.scientific_name %></p>
+            <% end %>
+          </div>
 
-      <div class="detail-copy mt-4 surface-card p-4">
-        <%= @plant_info || "Coming soon..." %>
+          <%= button_to save_plant_path(@plant), method: :post, class: "btn btn-soft-danger rounded-pill px-4 py-2" do %>
+            Save Plant
+          <% end %>
+        </div>
+
+        <div class="detail-copy"><%= @plant_info.to_s.strip.presence || "Coming soon..." %></div>
       </div>
     </div>
 
+    <div class="col-12">
+      <section class="plant-assistant">
+        <% if user_signed_in? %>
+          <% quick_questions = [
+            "Growth style?",
+            "Air quality?",
+            "Leaf problems?"
+          ] %>
+
+          <div class="plant-assistant-messages">
+            <%= render @chat.messages %>
+          </div>
+
+          <div class="plant-assistant-prompts">
+            <% quick_questions.each do |question| %>
+              <%= button_to question,
+                            plant_assistant_messages_path(@plant),
+                            method: :post,
+                            params: { message: { content: question } },
+                            class: "plant-assistant-prompt" %>
+            <% end %>
+          </div>
+
+          <%= simple_form_for @message,
+                              url: plant_assistant_messages_path(@plant),
+                              html: { class: "plant-assistant-form" } do |f| %>
+            <%= f.input :content,
+                        label: false,
+                        placeholder: "Ask a follow-up question...",
+                        input_html: { class: "plant-assistant-input" } %>
+            <%= f.button :submit, "Send", class: "btn btn-success plant-assistant-submit" %>
+          <% end %>
+        <% else %>
+          <p class="plant-assistant-note">Log in to ask care questions about this plant.</p>
+          <%= link_to "Log in to ask",
+                      new_user_session_path,
+                      class: "btn btn-outline-success rounded-pill px-4" %>
+        <% end %>
+      </section>
+    </div>
   </div>
   </div>
 </div>

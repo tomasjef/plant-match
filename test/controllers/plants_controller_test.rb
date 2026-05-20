@@ -4,15 +4,13 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @plant = Plant.create!(
       name: "Test Fern",
-      growth_style: "bushy",
       light_needs: "low",
       water_needs: "moderate",
       care_level: "easy",
       indoor_outdoor: "indoor",
       pet_safe: true,
-      air_purifying: true,
       image_url: "https://example.com/test-fern.jpg",
-      plant_info: "Test care information"
+      description: "Test care information"
     )
   end
 
@@ -31,10 +29,8 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
       light_needs: "low",
       water_needs: "moderate",
       care_level: "easy",
-      growth_style: "bushy",
       indoor_outdoor: "indoor",
-      pet_safe: "true",
-      air_purifying: "true"
+      pet_safe: "true"
     }
 
     assert_response :success

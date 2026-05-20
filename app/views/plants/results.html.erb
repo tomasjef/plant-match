@@ -25,13 +25,13 @@
 
         <div class="plant-card surface-card">
           <% if plant.image_url.present? %>
-            <%= image_tag plant.image_url, class: "plant-card-image", alt: plant.name %>
+            <%= image_tag plant.image_url, class: "plant-card-image", alt: plant.display_name %>
           <% else %>
             <div class="plant-placeholder">Plant</div>
           <% end %>
 
           <div class="plant-card-body">
-            <h2 class="plant-card-title"><%= plant.name %></h2>
+            <h2 class="plant-card-title"><%= plant.display_name %></h2>
             <%= render "plants/plant_tags", plant: plant %>
 
             <div class="plant-actions">

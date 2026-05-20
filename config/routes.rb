@@ -6,6 +6,10 @@ Rails.application.routes.draw do
     password: "password"
   }
 
+  post "plants/:plant_id/assistant/messages",
+     to: "messages#create",
+     as: :plant_assistant_messages
+
   root to: "pages#home"
 
   get "find-a-plant", to: "chats#new", as: :find_plant
@@ -17,8 +21,4 @@ Rails.application.routes.draw do
 
   get "my-plants", to: "favorites#index", as: :my_plants
   delete "my-plants/:id", to: "favorites#destroy", as: :saved_plant
-
-  post "plant-assistant", to: "chats#create", as: :plant_chats
-  get "plant-assistant/:id", to: "chats#show", as: :plant_chat
-  post "plant-assistant/:chat_id/messages", to: "messages#create", as: :plant_chat_messages
 end

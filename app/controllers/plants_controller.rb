@@ -6,20 +6,27 @@ class PlantsController < ApplicationController
   end
 
   def results
+    remember_match_params
+    @plants = import_perenual_results
+    score_plants
+  rescue StandardError => e
+    Rails.logger.warn("Perenual search failed: #{e.class} - #{e.message}")
     @plants = indoor_plants
     score_plants
   end
 
   def show
     @plant = Plant.find(params[:id])
+    @back_to_matches_path = plant_matches_path(session[:plant_match_params] || {})
+    sync_perenual_details(@plant)
 
-    if @plant.plant_info.blank?
-      response = generate_plant_info(@plant)
-      @plant.update(plant_info: response)
-    end
-
-    @plant_info = @plant.plant_info.presence ||
+    @plant_info = @plant.description.presence ||
                   "Plant care information is not available yet. Please try again later."
+
+    return unless user_signed_in?
+
+    @chat = current_user.chats.find_or_create_by!(plant: @plant)
+    @message = Message.new
   end
 
   private
@@ -28,17 +35,31 @@ class PlantsController < ApplicationController
     Plant.where(indoor_outdoor: %w[indoor both])
   end
 
-  def generate_plant_info(plant)
-    RubyLLM.chat
-           .with_instructions("You are a plant expert. Be concise and informative.")
-           .ask("For a #{plant.name} plant, give me:
-      1. Care tips
-      2. A short history of this plant
-      3. A common illness for this plant and the method of treatment")
-           .content
+  def perenual_client
+    Perenual::Client.new
+  end
+
+  def import_perenual_results
+    Perenual::MatchPlants.new(params: params).call
+  end
+
+  def remember_match_params
+    session[:plant_match_params] = params.permit(
+      :light_needs,
+      :water_needs,
+      :care_level,
+      :pet_safe
+    ).to_h
+  end
+
+  def sync_perenual_details(plant)
+    return if plant.perenual_id.blank?
+    return if plant.description.present? && plant.synced_at.present? && plant.synced_at > 7.days.ago
+
+    details = perenual_client.species_details(plant.perenual_id)
+    Perenual::ImportPlant.new(details).call
   rescue StandardError => e
-    Rails.logger.warn("Plant info generation failed for plant #{plant.id}: #{e.class} - #{e.message}")
-    nil
+    Rails.logger.warn("Perenual detail sync failed for plant #{plant.id}: #{e.class} - #{e.message}")
   end
 
   def score_plants
@@ -48,12 +69,12 @@ class PlantsController < ApplicationController
   end
 
   def score_for(plant)
-    string_criteria = %i[light_needs water_needs care_level growth_style]
+    string_criteria = %i[light_needs water_needs care_level]
     string_score = string_criteria.count do |attribute|
       params[attribute].present? && plant.public_send(attribute) == params[attribute]
     end
 
-    string_score + boolean_score_for(plant, :pet_safe) + boolean_score_for(plant, :air_purifying)
+    string_score + boolean_score_for(plant, :pet_safe)
   end
 
   def boolean_score_for(plant, attribute)

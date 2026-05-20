@@ -1,239 +1,166 @@
-<div data-controller="questionnaire" class="questionnaire-wrapper">
+<div class="app-page questionnaire-page">
+  <div class="app-container">
+    <div data-controller="questionnaire" class="questionnaire-wrapper">
+      <div class="questionnaire-image"></div>
 
-  <!-- Left image panel -->
-  <div class="questionnaire-image">
-    <%# <div class="questionnaire-image-text">
-      <p class="questionnaire-brand">Plant Match Maker</p>
-      <p class="questionnaire-tagline">Find your plant match</p>
-      <p class="questionnaire-sub">6 quick questions</p>
-    </div> %>
-  </div>
+      <div class="questionnaire-form">
+        <div class="questionnaire-progress">
+          <span data-questionnaire-target="counter">Question 1 of 4</span>
+          <div class="questionnaire-progress-track">
+            <div class="questionnaire-progress-bar"
+                 data-questionnaire-target="progressBar"
+                 style="width: 0%"></div>
+          </div>
+        </div>
 
-  <!-- Right form panel -->
-  <div class="questionnaire-form">
+        <%= form_with url: plant_matches_path, method: :get, local: true do |f| %>
+          <div data-questionnaire-target="step" class="questionnaire-step">
+            <p class="questionnaire-category">Light</p>
+            <p class="questionnaire-q">How much natural light does the room get?</p>
 
-    <!-- Progress -->
-    <div class="questionnaire-progress">
-      <span data-questionnaire-target="counter">Question 1 of 6</span>
-      <div class="questionnaire-progress-track">
-        <div class="questionnaire-progress-bar"
-             data-questionnaire-target="progressBar"
-             style="width: 0%"></div>
+            <div class="questionnaire-options">
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="light_needs" value="low" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Low light</p>
+                  <p class="option-desc">Mostly shade or dim rooms</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="light_needs" value="bright indirect" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Bright indirect</p>
+                  <p class="option-desc">Bright but no direct sun</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="light_needs" value="direct sun" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Direct sun</p>
+                  <p class="option-desc">Lots of sunlight most of the day</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="questionnaire-buttons">
+              <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
+            </div>
+          </div>
+
+          <div data-questionnaire-target="step" class="questionnaire-step">
+            <p class="questionnaire-category">Water</p>
+            <p class="questionnaire-q">How often can you water your plant?</p>
+
+            <div class="questionnaire-options">
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="water_needs" value="low" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Rarely</p>
+                  <p class="option-desc">Once every 2-3 weeks is fine</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="water_needs" value="moderate" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Sometimes</p>
+                  <p class="option-desc">Once a week works for me</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="water_needs" value="high" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Often</p>
+                  <p class="option-desc">I enjoy watering regularly</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="questionnaire-buttons">
+              <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
+              <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
+            </div>
+          </div>
+
+          <div data-questionnaire-target="step" class="questionnaire-step">
+            <p class="questionnaire-category">Experience</p>
+            <p class="questionnaire-q">How experienced are you with plants?</p>
+
+            <div class="questionnaire-options">
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="care_level" value="easy" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Beginner</p>
+                  <p class="option-desc">I keep forgetting to water</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="care_level" value="medium" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Some experience</p>
+                  <p class="option-desc">I've kept a few plants alive</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="care_level" value="advanced" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Experienced</p>
+                  <p class="option-desc">I love a challenge</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="questionnaire-buttons">
+              <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
+              <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
+            </div>
+          </div>
+
+          <div data-questionnaire-target="step" class="questionnaire-step">
+            <p class="questionnaire-category">Pets</p>
+            <p class="questionnaire-q">Do you have pets at home?</p>
+
+            <div class="questionnaire-options">
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="pet_safe" value="true" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">Yes</p>
+                  <p class="option-desc">I need a pet-safe plant</p>
+                </div>
+              </label>
+
+              <label class="option-card" data-action="click->questionnaire#selectOption">
+                <input type="radio" name="pet_safe" value="false" class="option-radio">
+                <div class="option-indicator"></div>
+                <div>
+                  <p class="option-label">No pets</p>
+                  <p class="option-desc">No pets at home</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="questionnaire-buttons">
+              <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
+              <%= f.submit "Find my plant", class: "questionnaire-next" %>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
-
-    <%= form_with url: plant_matches_path, method: :get, local: true do |f| %>
-
-      <!-- Step 1: Light -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Light</p>
-        <p class="questionnaire-q">How much natural light does the room get?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="light_needs" value="low" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Low light</p>
-              <p class="option-desc">Mostly shade or dim rooms</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="light_needs" value="bright indirect" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Bright indirect</p>
-              <p class="option-desc">Bright but no direct sun</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="light_needs" value="direct sun" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Direct sun</p>
-              <p class="option-desc">Lots of sunlight most of the day</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-<button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
-
-</div>      </div>
-
-      <!-- Step 2: Water -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Water</p>
-        <p class="questionnaire-q">How often can you water your plant?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="water_needs" value="low" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Rarely</p>
-              <p class="option-desc">Once every 2-3 weeks is fine</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="water_needs" value="moderate" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Sometimes</p>
-              <p class="option-desc">Once a week works for me</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="water_needs" value="high" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Often</p>
-              <p class="option-desc">I enjoy watering regularly</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-  <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
-  <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
-</div>      </div>
-
-      <!-- Step 3: Care level -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Experience</p>
-        <p class="questionnaire-q">How experienced are you with plants?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="care_level" value="easy" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Beginner</p>
-              <p class="option-desc">I keep forgetting to water</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="care_level" value="medium" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Some experience</p>
-              <p class="option-desc">I've kept a few plants alive</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="care_level" value="advanced" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Experienced</p>
-              <p class="option-desc">I love a challenge</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-  <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
-  <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
-</div>      </div>
-
-      <!-- Step 4: Growth style -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Look</p>
-        <p class="questionnaire-q">What kind of plant shape do you prefer?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="growth_style" value="upright" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Upright</p>
-              <p class="option-desc">Tall and structured</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="growth_style" value="trailing" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Trailing</p>
-              <p class="option-desc">Vines and hanging plants</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="growth_style" value="climbing" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Climbing</p>
-              <p class="option-desc">Plants that grow upward</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="growth_style" value="bushy" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Bushy</p>
-              <p class="option-desc">Full and leafy</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="growth_style" value="compact" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Compact</p>
-              <p class="option-desc">Small and neat</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-  <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
-  <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
-</div>      </div>
-
-      <!-- Step 5: Pet safe -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Pets</p>
-        <p class="questionnaire-q">Do you have pets at home?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="pet_safe" value="true" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Yes</p>
-              <p class="option-desc">I need a pet-safe plant</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="pet_safe" value="false" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">No pets</p>
-              <p class="option-desc">No pets at home</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-  <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
-  <button type="button" class="questionnaire-next" data-action="click->questionnaire#next">Next →</button>
-</div>      </div>
-
-      <!-- Step 6: Air purifying -->
-      <div data-questionnaire-target="step" class="questionnaire-step">
-        <p class="questionnaire-category">Benefits</p>
-        <p class="questionnaire-q">Do you want an air purifying plant?</p>
-        <div class="questionnaire-options">
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="air_purifying" value="true" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Yes please</p>
-              <p class="option-desc">Clean air is important to me</p>
-            </div>
-          </label>
-          <label class="option-card" data-action="click->questionnaire#selectOption">
-            <input type="radio" name="air_purifying" value="false" class="option-radio">
-            <div class="option-indicator"></div>
-            <div>
-              <p class="option-label">Not essential</p>
-              <p class="option-desc">I just want a beautiful plant</p>
-            </div>
-          </label>
-        </div>
-<div class="questionnaire-buttons">
-  <button type="button" class="questionnaire-back" data-action="click->questionnaire#previous">← Back</button>
-  <%= f.submit "Find my plant", class: "questionnaire-next" %>
-</div>      </div>
-
-    <% end %>
   </div>
 </div>

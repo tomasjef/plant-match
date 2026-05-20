@@ -153,11 +153,48 @@
 }
 
 .message {
-  border: 1px solid #dfe8d8;
   border-radius: 8px;
   background: #ffffff;
+  border: 1px solid #dfe8d8;
   margin-bottom: 10px;
   padding: 12px 14px;
+}
+
+.message-assistant {
+  background: #fbfcfa;
+}
+
+.message-user {
+  background: #eef4e6;
+  border-color: #c8d9b8;
+}
+
+.message-role {
+  color: #68705f;
+  font-size: 0.75rem;
+  margin: 0 0 4px;
+}
+
+.message-content {
+  color: #26301f;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.suggested-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.suggested-question {
+  border: 1px solid #d7e1cf;
+  border-radius: 999px;
+  background: #fbfcfa;
+  color: #26301f;
+  font-size: 0.85rem;
+  padding: 8px 12px;
 }
 
 .detail-image {
@@ -168,10 +205,112 @@
   border-radius: 8px;
 }
 
+.plant-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 680px;
+}
+
+.plant-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.detail-scientific-name {
+  color: #68705f;
+  font-style: italic;
+  margin: 8px 0 0;
+}
+
 .detail-copy {
   color: #3c4535;
   line-height: 1.7;
   white-space: pre-line;
+}
+
+.plant-assistant {
+  border-top: 1px solid #dfe8d8;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
+.plant-assistant-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: left;
+}
+
+.plant-assistant-prompts form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.plant-assistant-prompt {
+  background: #fbfcfa;
+  border: 1px solid #d7e1cf;
+  border-radius: 8px;
+  color: #26301f;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.2;
+  padding: 9px 12px;
+}
+
+.plant-assistant-prompt:hover {
+  background: #eef4e6;
+  border-color: #c8d9b8;
+  color: #2f561b;
+}
+
+.plant-assistant-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plant-assistant-messages:empty {
+  display: none;
+}
+
+.plant-assistant-form {
+  display: flex;
+  gap: 10px;
+}
+
+.plant-assistant-form .mb-3 {
+  flex: 1;
+  margin-bottom: 0 !important;
+}
+
+.plant-assistant-input {
+  border-color: #dfe8d8;
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.plant-assistant-input:focus {
+  border-color: #c8d9b8;
+  box-shadow: 0 0 0 0.18rem rgba(74, 124, 47, 0.12);
+}
+
+.plant-assistant-submit {
+  border-radius: 8px;
+  min-width: 168px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.plant-assistant-note {
+  color: #68705f;
+  margin: 0;
 }
 
 .btn-soft-danger {
@@ -207,6 +346,15 @@
   }
 
   .plant-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .plant-detail-header {
+    flex-direction: column;
+  }
+
+  .plant-assistant-form {
     align-items: stretch;
     flex-direction: column;
   }

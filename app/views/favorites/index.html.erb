@@ -14,13 +14,13 @@
       <% @favorites.each do |favorite| %>
         <div class="plant-card surface-card">
           <% if favorite.plant.image_url.present? %>
-            <%= image_tag favorite.plant.image_url, class: "plant-card-image", alt: favorite.plant.name %>
+            <%= image_tag favorite.plant.image_url, class: "plant-card-image", alt: favorite.plant.display_name %>
           <% else %>
             <div class="plant-placeholder">Plant</div>
           <% end %>
 
           <div class="plant-card-body">
-            <h2 class="plant-card-title"><%= favorite.plant.name %></h2>
+            <h2 class="plant-card-title"><%= favorite.plant.display_name %></h2>
             <%= render "plants/plant_tags", plant: favorite.plant %>
 
             <div class="plant-actions">

@@ -5,15 +5,46 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     @user = User.create!(email: "message-user@example.com", password: "password")
-    @chat = @user.chats.create!
+    @plant = Plant.create!(
+      name: "Message Test Plant",
+      light_needs: "low",
+      water_needs: "moderate",
+      care_level: "easy",
+      indoor_outdoor: "indoor",
+      pet_safe: true,
+      image_url: "https://example.com/message-test-plant.jpg",
+      description: "A plant used for message tests."
+    )
+    @chat = @user.chats.create!(plant: @plant)
     sign_in @user
   end
 
   test "should create message" do
-    assert_difference("@chat.messages.count", 1) do
-      post plant_chat_messages_url(@chat), params: { message: { content: "Low light, please" } }
+    assistant = Struct.new(:reply) do
+      def call
+        reply
+      end
+    end.new("AI reply")
+
+    with_assistant_stub(assistant) do
+      assert_difference("@chat.messages.count", 2) do
+        post plant_assistant_messages_url(@plant), params: { message: { content: "Low light, please" } }
+      end
     end
 
-    assert_redirected_to plant_chat_url(@chat)
+    assert_redirected_to plant_url(@plant)
+  end
+
+  private
+
+  def with_assistant_stub(assistant)
+    original_new = PlantAssistant.method(:new)
+    PlantAssistant.define_singleton_method(:new) { |**| assistant }
+
+    yield
+  ensure
+    PlantAssistant.define_singleton_method(:new) do |*args, **kwargs, &block|
+      original_new.call(*args, **kwargs, &block)
+    end
   end
 end

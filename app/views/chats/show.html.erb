@@ -5,8 +5,8 @@
     <div class="page-header">
       <div>
         <p class="page-kicker">Plant assistant</p>
-        <h1 class="page-title">Ask About Plants</h1>
-        <p class="page-subtitle">Use this space for follow-up questions while the dedicated plant chat is being shaped.</p>
+        <h1 class="page-title">Ask About <%= @plant.display_name %></h1>
+        <p class="page-subtitle">Get practical care help based on this plant’s details.</p>
       </div>
     </div>
 
@@ -18,7 +18,15 @@
     </div>
 
     <div id="new_message_container" class="surface-card p-4">
-      <%= simple_form_for @message, url: plant_chat_messages_path(@chat) do |f| %>
+      <p class="text-muted small mb-2">Try asking:</p>
+      <div class="suggested-questions">
+        <span class="suggested-question">Which room would suit this plant?</span>
+        <span class="suggested-question">Is this a good trailing or upright plant?</span>
+        <span class="suggested-question">Can this plant help with air quality?</span>
+        <span class="suggested-question">What should I do if the leaves turn yellow?</span>
+      </div>
+
+      <%= simple_form_for @message, url: plant_assistant_messages_path(@plant) do |f| %>
         <%= f.input :content,
                     label: "Question",
                     required: true,

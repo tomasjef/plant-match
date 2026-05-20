@@ -14,7 +14,7 @@ class FavoritesController < ApplicationController
     @favorite = Favorite.new(user: current_user, plant: @plant)
 
     if @favorite.save
-      redirect_back fallback_location: plant_matches_path, notice: "#{@plant.name} saved to My Plants."
+      redirect_back fallback_location: plant_matches_path, notice: "#{@plant.display_name} saved to My Plants."
     else
       # Falls der User die Pflanze schon hat (Validierung), zurück zum Index
       redirect_back fallback_location: my_plants_path, alert: "Already in My Plants."
