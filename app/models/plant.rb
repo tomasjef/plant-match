@@ -1,5 +1,5 @@
 class Plant < ApplicationRecord
-  has_many :favorites
+  has_many :favorites, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
   validates :image_url, presence: true

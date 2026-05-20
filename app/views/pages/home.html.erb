@@ -1,23 +1,25 @@
-<div class="container py-3">
+<div class="app-page">
+  <div class="app-container">
 
-<div class="row align-items-center justify-content-center mb-2 g-5">
-<div class="col-md-6">
-  <%= image_tag "hero-plant.jpg", class: "img-fluid rounded-4", style: "max-height: 500px; width: 100%; object-fit: cover; object-position: top; margin-top: 10px;" %>
+  <div class="row align-items-center justify-content-center g-5">
+    <div class="col-md-6">
+      <%= image_tag "hero-plant.jpg", class: "img-fluid detail-image", alt: "Plants on a bright shelf" %>
     </div>
     <div class="col-md-6 text-start align-items-center">
-      <p class="text-uppercase fw-semibold small mb-3" style="color: #7A9060; letter-spacing: 0.1em;">Your personal plant matchmaker</p>
-      <h1 class="display-6 fw-semibold mb-3" style="font-family: Georgia, serif;">
-        Find your <em style="color: #4A7C2F;">perfect</em> plant match
+      <p class="page-kicker">Plant Match Maker</p>
+      <h1 class="display-5 mb-3">
+        Find the right plant<br>
+        for your home
       </h1>
-      <p class="lead text-muted mb-4">Answer a few questions about your space and lifestyle. We'll find the plant that's perfectly suited for you.</p>
+      <p class="lead text-muted mb-4">Answer a few questions and get plants that fit your rooms, habits, and lifestyle.</p>
       <div class="d-flex flex-wrap gap-3">
         <% if user_signed_in? %>
           <%# Buttons for logged in User %>
-          <%= link_to "Find your plant match", new_chat_path, class: "btn btn-success rounded-pill px-4 py-3" %>
-          <%= link_to "See your favorites", favorites_path, class: "btn btn-outline-success rounded-pill px-4 py-3" %>
+          <%= link_to "Find a match", find_plant_path, class: "btn btn-success rounded-pill px-4 py-3" %>
+          <%= link_to "My Plants", my_plants_path, class: "btn btn-outline-success rounded-pill px-4 py-3" %>
         <% else %>
           <%# Button for guests %>
-          <%= link_to "Get started", new_user_registration_path, class: "btn btn-success rounded-pill px-5 py-3" %>
+          <%= link_to "Find a match", new_user_registration_path, class: "btn btn-success rounded-pill px-5 py-3" %>
         <% end %>
       </div>
     </div>
@@ -25,42 +27,43 @@
 
   <div class="row g-3 align-items-stretch text-center mt-5">
     <div class="col-md-4">
-      <div class="border p-4 h-100 rounded-4" style="background: #F9FBF7;">
-        <p style="font-size: 28px; color: #C8D9B8; font-family: Georgia, serif;">01</p>
-        <h5 class="fw-semibold">Tell us about your space</h5>
-        <p class="text-muted small">Light levels, pets, kids — we ask the things that matter</p>
-        <%= image_tag "plant1.jpg", class: "img-fluid rounded-3 mt-3", style: "max-height: 120px;" %>
+      <div class="surface-card p-4 h-100">
+        <p class="page-kicker">01</p>
+        <h5>Describe your rooms</h5>
+        <p class="text-muted small">Tell us about light, pets, and how much care you want to give.</p>
+        <%= image_tag "plant1.jpg", class: "img-fluid rounded mt-3 home-step-image", alt: "Small plant" %>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="border p-4 h-100 rounded-4" style="background: #F9FBF7;">
-        <p style="font-size: 28px; color: #C8D9B8; font-family: Georgia, serif;">02</p>
-        <h5 class="fw-semibold">We find your match</h5>
-        <p class="text-muted small">Our AI filters plants to find the ones built for your environment and needs</p>
-        <%= image_tag "plant2.jpg", class: "img-fluid rounded-3 mt-3", style: "max-height: 120px;" %>
+      <div class="surface-card p-4 h-100">
+        <p class="page-kicker">02</p>
+        <h5>Get tailored matches</h5>
+        <p class="text-muted small">See plants that suit your home, routine, and confidence level.</p>
+        <%= image_tag "plant2.jpg", class: "img-fluid rounded mt-3 home-step-image", alt: "Potted plant" %>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="border p-4 h-100 rounded-4" style="background: #F9FBF7;">
-        <p style="font-size: 28px; color: #C8D9B8; font-family: Georgia, serif;">03</p>
-        <h5 class="fw-semibold">Meet your match</h5>
-        <p class="text-muted small">Get your personalised plant recommendation and find where to buy it</p>
-        <%= image_tag "plant3.jpg", class: "img-fluid rounded-3 mt-3", style: "max-height: 120px;" %>
+      <div class="surface-card p-4 h-100">
+        <p class="page-kicker">03</p>
+        <h5>Save your favourites</h5>
+        <p class="text-muted small">Keep the plants you like in My Plants so you can come back to them later.</p>
+        <%= image_tag "plant3.jpg", class: "img-fluid rounded mt-3 home-step-image", alt: "Plant leaves" %>
       </div>
     </div>
   </div>
 
   <div class="mt-5 text-center mb-4">
-    <p class="text-muted small mb-3">We match for</p>
+    <p class="text-muted small mb-3">Matched around what matters</p>
     <div class="d-flex flex-wrap justify-content-center gap-2">
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Non-toxic to pets</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Low light</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Water intake</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Low maintenance</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Air purifying</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Child safe</span>
-      <span class="badge rounded-pill border text-dark fs-6 fw-light">Budget friendly</span>
+      <span class="plant-tag">Pet safe</span>
+      <span class="plant-tag">Low light</span>
+      <span class="plant-tag">Water needs</span>
+      <span class="plant-tag">Easy care</span>
+      <span class="plant-tag">Air purifying</span>
+      <span class="plant-tag">Indoor spaces</span>
+      <span class="plant-tag">Small rooms</span>
     </div>
   </div>
 
+  </div>
 </div>

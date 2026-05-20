@@ -1,6 +1,7 @@
-<div class="container py-4">
+<div class="app-page">
+  <div class="app-container">
 
-  <%= link_to "← Back to catalog", plants_path, style: "color:#4A7C2F; text-decoration:none" %>
+  <%= link_to "← Find another match", find_plant_path, class: "back-link" %>
 
   <div class="row g-4 mt-3">
 
@@ -8,40 +9,33 @@
     <div class="col-md-5">
       <div class="position-relative">
         <% if @plant.image_url.present? %>
-          <%= image_tag @plant.image_url, class: "img-fluid rounded-3", style: "height:400px; width:100%; object-fit:cover;" %>
+          <%= image_tag @plant.image_url, class: "detail-image", alt: @plant.name %>
         <% else %>
-          <div class="bg-secondary d-flex align-items-center justify-content-center rounded-3" style="height:400px">
-            <span style="color:white; font-size:80px">🌿</span>
+          <div class="plant-placeholder detail-image">
+            Plant
           </div>
         <% end %>
       </div>
 
-<div class="d-flex flex-wrap gap-2 mt-3">
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">🌱 <%= @plant.care_level %></span>
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">☀️ <%= @plant.light_needs %></span>
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">💧 <%= @plant.water_needs %></span>
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">🌿 <%= @plant.growth_style %></span>
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">🏠 <%= @plant.indoor_outdoor %></span>
-  <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;"><%= @plant.pet_safe ? "✅ pet safe" : "❌ not pet safe" %></span>
-  <% if @plant.air_purifying %>
-    <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.9rem; padding:8px 14px;">💨 air purifying</span>
-  <% end %>
-</div>
+      <div class="mt-3">
+        <%= render "plants/plant_tags", plant: @plant %>
+      </div>
     </div>
 
     <%# RIGHT COLUMN — name + button + description %>
-    <div class="col-md-7 ps-5 d-flex flex-column">
-      <div class="d-flex align-items-start justify-content-between">
-        <h1 style="font-weight:600"><%= @plant.name %></h1>
-        <%= button_to plant_favorites_path(@plant), method: :post, class: "btn btn-outline-danger rounded-pill px-4 py-2 shadow-sm" do %>
-          Add to Favorites ❤️
+    <div class="col-md-7 ps-md-5 d-flex flex-column">
+      <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+        <h1 class="page-title"><%= @plant.name %></h1>
+        <%= button_to save_plant_path(@plant), method: :post, class: "btn btn-soft-danger rounded-pill px-4 py-2" do %>
+          Save Plant
         <% end %>
       </div>
 
-      <div class="mt-4" style="white-space: pre-line">
+      <div class="detail-copy mt-4 surface-card p-4">
         <%= @plant_info || "Coming soon..." %>
       </div>
     </div>
 
+  </div>
   </div>
 </div>

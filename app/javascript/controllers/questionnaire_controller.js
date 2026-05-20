@@ -13,7 +13,7 @@ export default class extends Controller {
     this.stepTargets.forEach((step, i) => {
       step.style.display = i === index ? "flex" : "none"
     })
-    const percent = Math.round((index / this.totalSteps) * 100)
+    const percent = this.totalSteps > 1 ? Math.round((index / (this.totalSteps - 1)) * 100) : 100
     this.progressBarTarget.style.width = `${percent}%`
     this.counterTarget.textContent = `Question ${index + 1} of ${this.totalSteps}`
 

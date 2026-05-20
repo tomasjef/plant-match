@@ -1,7 +1,8 @@
 .questionnaire-wrapper {
   display: flex;
-  height: 100vh;
+  min-height: calc(100vh - 64px);
   overflow: hidden;
+  background: #ffffff;
 }
 
 .questionnaire-image {
@@ -24,7 +25,7 @@
 .questionnaire-brand {
   color: #4A7C27;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 6px;
@@ -33,7 +34,7 @@
 .questionnaire-tagline {
   color: white;
   font-size: 22px;
-  font-weight: 500;
+  font-weight: 400;
   margin-bottom: 6px;
 }
 
@@ -77,7 +78,7 @@
 .questionnaire-category {
   font-size: 13px;
   color: #4A7C27;
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
@@ -85,7 +86,7 @@
 
 .questionnaire-q {
   font-size: 22px;
-  font-weight: 500;
+  font-weight: 400;
   color: #1a1a1a;
   line-height: 1.3;
   margin: 0;
@@ -139,7 +140,7 @@
 
 .option-label {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   color: #1a1a1a;
   margin: 0 0 2px;
 }
@@ -165,7 +166,7 @@
   border-radius: 8px;
   padding: 13px 20px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   width: 100%;
   transition: background 0.15s;
@@ -182,7 +183,7 @@
   border-radius: 8px;
   padding: 13px 20px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -202,4 +203,32 @@
 
 .questionnaire-buttons .questionnaire-next {
   flex: 2;
+}
+
+@media (max-width: 900px) {
+  .questionnaire-wrapper {
+    display: block;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .questionnaire-image {
+    width: 100%;
+    min-height: 220px;
+  }
+
+  .questionnaire-form {
+    padding: 32px 20px 44px;
+  }
+}
+
+@media (max-width: 575px) {
+  .questionnaire-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .questionnaire-buttons .questionnaire-back,
+  .questionnaire-buttons .questionnaire-next {
+    flex: auto;
+  }
 }

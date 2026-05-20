@@ -14,10 +14,10 @@ class FavoritesController < ApplicationController
     @favorite = Favorite.new(user: current_user, plant: @plant)
 
     if @favorite.save
-      redirect_back fallback_location: plants_path, notice: "#{@plant.name} added to your favorites! 🌱"
+      redirect_back fallback_location: plant_matches_path, notice: "#{@plant.name} saved to My Plants."
     else
       # Falls der User die Pflanze schon hat (Validierung), zurück zum Index
-      redirect_back fallback_location: plants_path, alert: "Already in your favorites."
+      redirect_back fallback_location: my_plants_path, alert: "Already in My Plants."
     end
   end
 
@@ -25,6 +25,6 @@ class FavoritesController < ApplicationController
   def destroy
     @favorite = current_user.favorites.find(params[:id])
     @favorite.destroy
-    redirect_to favorites_path, status: :see_other, notice: "Removed from favorites."
+    redirect_to my_plants_path, status: :see_other, notice: "Removed from My Plants."
   end
 end

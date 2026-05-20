@@ -4,14 +4,10 @@ class ChatsController < ApplicationController
   end
 
   def create
-    # @plant = Plant.find(params[:plant_id])
-
-    @chat = Chat.new(title: Chat::DEFAULT_TITLE)
-    # @chat.plant = @plant
-    @chat.user = current_user
+    @chat = current_user.chats.build
 
     if @chat.save
-      redirect_to chat_path(@chat)
+      redirect_to plant_chat_path(@chat)
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +28,7 @@ end
 #     @chat.user = current_user
 
 #     if @chat.save
-#       redirect_to chat_path(@chat)
+#       redirect_to plant_chat_path(@chat)
 #     else
 #       @chats = @plant.chats.where(user: current_user)
 #       render "plants/show"
