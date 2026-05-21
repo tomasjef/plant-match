@@ -27,6 +27,7 @@ class PlantAssistant
 
   def normalize_reply(content)
     text = strip_code_fence(content.to_s.strip)
+    text = strip_repetitive_opening(text)
 
     return FALLBACK_REPLY if malformed_reply?(text)
 
@@ -35,6 +36,10 @@ class PlantAssistant
 
   def strip_code_fence(text)
     text.sub(/\A```[a-zA-Z0-9_-]*\s*/m, "").sub(/\s*```\z/m, "").strip
+  end
+
+  def strip_repetitive_opening(text)
+    text.sub(/\Aaccording to the provided data,?\s*/i, "").strip.sub(/\A[[:lower:]]/) { |char| char.upcase }
   end
 
   def malformed_reply?(text)
@@ -46,6 +51,8 @@ class PlantAssistant
       You are a helpful houseplant care assistant.
       Answer using the plant data provided.
       Be practical, concise, and beginner-friendly.
+      Start answers directly and naturally.
+      Do not begin with phrases like "According to the provided data" or "Based on the data".
       If the API data does not contain the answer, say so clearly.
       Do not invent exact facts such as toxicity, watering needs, or light needs.
     PROMPT

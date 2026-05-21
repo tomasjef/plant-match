@@ -21,4 +21,10 @@ class PlantAssistantTest < ActiveSupport::TestCase
     assert_equal PlantAssistant::FALLBACK_REPLY,
                  @assistant.send(:normalize_reply, "`")
   end
+
+  test "removes repetitive provided data opener" do
+    reply = @assistant.send(:normalize_reply, "According to the provided data, it grows slowly.")
+
+    assert_equal "It grows slowly.", reply
+  end
 end
