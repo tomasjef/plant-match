@@ -14,7 +14,7 @@
          class="mb-4"
          data-controller="chat"
          data-chat-target="messages">
-      <%= render @chat.messages %>
+      <%= render @chat.messages.recent_first %>
     </div>
 
     <div id="new_message_container" class="surface-card p-4">
