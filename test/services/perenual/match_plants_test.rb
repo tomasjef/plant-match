@@ -2,7 +2,28 @@ require "test_helper"
 
 module Perenual
   class MatchPlantsTest < ActiveSupport::TestCase
-    test "searches Perenual for indoor plants without fetching details" do
+    test "searches Perenual without fetching details and skips plants with no care content" do
+      client = FakePerenualClient.new
+
+      plants = MatchPlants.new(params: match_params, client: client).call
+
+      assert_empty plants
+      assert_empty client.detail_ids
+      assert_equal expected_search_params, client.species_list_params.first
+    end
+
+    test "keeps matches that already have cached care content" do
+      Plant.create!(
+        perenual_id: 98765,
+        name: "Cached Calathea",
+        light_needs: "bright indirect",
+        water_needs: "moderate",
+        care_level: "medium",
+        indoor_outdoor: "indoor",
+        pet_safe: true,
+        image_url: "https://example.com/cached-calathea.jpg",
+        description: "A cached leafy indoor plant."
+      )
       client = FakePerenualClient.new
 
       plants = MatchPlants.new(params: match_params, client: client).call
@@ -10,8 +31,8 @@ module Perenual
       assert_equal 1, plants.size
       assert_empty client.detail_ids
       assert_equal "Calathea Orbifolia", plants.first.name
-      assert_nil plants.first.description
-      assert_equal "easy", plants.first.care_level
+      assert_equal "A cached leafy indoor plant.", plants.first.description
+      assert_equal "medium", plants.first.care_level
       assert plants.first.pet_safe
       assert_equal expected_search_params, client.species_list_params.first
     end

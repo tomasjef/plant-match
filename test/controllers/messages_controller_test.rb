@@ -35,6 +35,24 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to plant_url(@plant)
   end
 
+  test "should create message from quick question" do
+    assistant = Struct.new(:reply) do
+      def call
+        reply
+      end
+    end.new("Quick reply")
+
+    with_assistant_stub(assistant) do
+      assert_difference("@chat.messages.count", 2) do
+        post plant_assistant_messages_url(@plant), params: { message: { content: "Growth style?" } }
+      end
+    end
+
+    assert_equal "Growth style?", @chat.messages.where(role: "user").last.content
+    assert_equal "Quick reply", @chat.messages.where(role: "assistant").last.content
+    assert_redirected_to plant_url(@plant)
+  end
+
   private
 
   def with_assistant_stub(assistant)
