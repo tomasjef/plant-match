@@ -143,6 +143,14 @@
   box-shadow: 0 12px 32px rgba(25, 33, 21, 0.08);
 }
 
+.auth-link {
+  color: #4A7C2F;
+}
+
+.auth-link:hover {
+  color: #2f561b;
+}
+
 .home-step-image {
   max-height: 118px;
   object-fit: cover;
