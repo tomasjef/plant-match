@@ -20,8 +20,7 @@ class MessagesController < ApplicationController
   end
 
   def render_invalid_message
-    @plant_info = @plant.description.presence ||
-                  "Plant care information is not available yet. Please try again later."
+    @plant_info = @plant.description.presence || @plant.plant_info.presence
     render "plants/show", status: :unprocessable_entity
   end
 

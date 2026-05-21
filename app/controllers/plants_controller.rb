@@ -22,8 +22,7 @@ class PlantsController < ApplicationController
     @back_to_matches_path = plant_matches_path(session[:plant_match_params] || {})
     sync_perenual_details(@plant)
 
-    @plant_info = @plant.description.presence ||
-                  "Plant care information is not available yet. Please try again later."
+    @plant_info = @plant.description.presence || @plant.plant_info.presence
 
     return unless user_signed_in?
 
