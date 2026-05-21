@@ -2,16 +2,16 @@ require "test_helper"
 
 module Perenual
   class MatchPlantsTest < ActiveSupport::TestCase
-    test "searches Perenual for indoor plants and enriches matches with details" do
+    test "searches Perenual for indoor plants without fetching details" do
       client = FakePerenualClient.new
 
       plants = MatchPlants.new(params: match_params, client: client).call
 
       assert_equal 1, plants.size
-      assert_equal [98765], client.detail_ids
+      assert_empty client.detail_ids
       assert_equal "Calathea Orbifolia", plants.first.name
-      assert_equal "A leafy indoor plant.", plants.first.description
-      assert_equal "medium", plants.first.care_level
+      assert_nil plants.first.description
+      assert_equal "easy", plants.first.care_level
       assert plants.first.pet_safe
       assert_equal expected_search_params, client.species_list_params.first
     end
