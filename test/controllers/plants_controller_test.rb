@@ -88,6 +88,32 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".plant-card", 9
   end
 
+  test "results skip local fallback plants without care content" do
+    Plant.create!(
+      name: "Empty Result Plant",
+      light_needs: "low",
+      water_needs: "moderate",
+      care_level: "easy",
+      indoor_outdoor: "indoor",
+      pet_safe: true,
+      image_url: "https://example.com/empty-result-plant.jpg"
+    )
+
+    with_perenual_failure do
+      get plant_matches_url, params: {
+        light_needs: "low",
+        water_needs: "moderate",
+        care_level: "easy",
+        pet_safe: "true"
+      }
+    end
+
+    assert_response :success
+    assert_select ".plant-card", 1
+    assert_select ".plant-card", text: /Test Fern/
+    assert_select ".plant-card", text: /Empty Result Plant/, count: 0
+  end
+
   test "results deduplicate plants by scientific name" do
     @plant.update!(scientific_name: "Nephrolepis exaltata")
     Plant.create!(

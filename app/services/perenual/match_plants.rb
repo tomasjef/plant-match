@@ -11,7 +11,7 @@ module Perenual
     def call
       candidates.first(DETAIL_LIMIT)
                 .filter_map { |data| import(data) }
-                .select(&:care_content?)
+                .select(&:displayable?)
     end
 
     private
