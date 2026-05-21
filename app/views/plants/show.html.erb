@@ -51,7 +51,7 @@
           ] %>
 
           <div class="plant-assistant-messages">
-            <%= render @chat.messages %>
+            <%= render @chat.messages.recent_first %>
           </div>
 
           <div class="plant-assistant-prompts">
