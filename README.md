@@ -13,4 +13,3 @@ Live MVP: https://plant-match-01fac0858f9a.herokuapp.com/
 - Stimulus for the questionnaire interactions
 - Perenual API for plant data and images
 - RubyLLM for the plant assistant
-- Minitest and RuboCop for testing and linting
