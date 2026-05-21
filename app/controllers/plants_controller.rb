@@ -33,7 +33,7 @@ class PlantsController < ApplicationController
   private
 
   def indoor_plants
-    Plant.where(indoor_outdoor: %w[indoor both])
+    Plant.displayable.where(indoor_outdoor: %w[indoor both])
   end
 
   def perenual_client
@@ -64,7 +64,8 @@ class PlantsController < ApplicationController
   end
 
   def score_plants
-    scored_plants = @plants.map { |plant| { plant: plant, score: score_for(plant) } }
+    scored_plants = @plants.select(&:displayable?)
+                           .map { |plant| { plant: plant, score: score_for(plant) } }
 
     @plants = scored_plants
               .sort_by { |item| -item[:score] }
