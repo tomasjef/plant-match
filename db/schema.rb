@@ -10,17 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_17_135523) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_20_161819) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "chats", force: :cascade do |t|
     t.text "ai_output"
     t.datetime "created_at", null: false
+    t.bigint "plant_id"
     t.text "questionnaire_answers"
     t.text "questions_prompt"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["plant_id"], name: "index_chats_on_plant_id"
     t.index ["user_id"], name: "index_chats_on_user_id"
   end
 
@@ -44,17 +46,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_135523) do
 
   create_table "plants", force: :cascade do |t|
     t.boolean "air_purifying"
+    t.jsonb "api_data", default: {}, null: false
+    t.string "api_image_url"
     t.string "care_level"
     t.datetime "created_at", null: false
+    t.text "description"
     t.string "growth_style"
     t.string "image_url"
     t.string "indoor_outdoor"
     t.string "light_needs"
     t.string "name"
+    t.integer "perenual_id"
     t.boolean "pet_safe"
     t.text "plant_info"
+    t.string "scientific_name"
+    t.datetime "synced_at"
     t.datetime "updated_at", null: false
     t.string "water_needs"
+    t.index ["perenual_id"], name: "index_plants_on_perenual_id", unique: true
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -211,6 +220,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_135523) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "chats", "plants"
   add_foreign_key "chats", "users"
   add_foreign_key "favorites", "plants"
   add_foreign_key "favorites", "users"

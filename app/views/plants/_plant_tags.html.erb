@@ -1,0 +1,19 @@
+<div class="plant-tags">
+  <% if plant.care_level.present? %>
+    <span class="plant-tag">🌱 <%= plant.care_level %></span>
+  <% end %>
+
+  <% if plant.light_needs.present? %>
+    <span class="plant-tag">☀️ <%= plant.light_needs %></span>
+  <% end %>
+
+  <% if plant.water_needs.present? %>
+    <span class="plant-tag">💧 <%= plant.water_needs %></span>
+  <% end %>
+
+  <% if plant.indoor_outdoor.present? %>
+    <span class="plant-tag">🏠 indoor</span>
+  <% end %>
+
+  <span class="plant-tag"><%= plant.pet_safe ? "✅ pet safe" : "❌ not pet safe" %></span>
+</div>

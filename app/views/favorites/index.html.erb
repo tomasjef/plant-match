@@ -1,44 +1,34 @@
-<div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-5">
-    <h1 style="font-weight: 700;">My Favorites</h1>
+<div class="app-page">
+  <div class="app-container">
+  <div class="page-header">
+    <div>
+      <p class="page-kicker">Saved collection</p>
+      <h1 class="page-title">My Plants</h1>
+      <p class="page-subtitle">Plants you have saved from your matches.</p>
+    </div>
+    <%= link_to "Find a Plant", find_plant_path, class: "btn btn-success rounded-pill px-4" %>
   </div>
 
   <% if @favorites.any? %>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="plant-grid">
       <% @favorites.each do |favorite| %>
-        <div class="col">
-          <div class="card h-100 border-0 rounded-4 overflow-hidden" style="box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-            <% if favorite.plant.image_url.present? %>
-              <img src="<%= favorite.plant.image_url %>" class="card-img-top" style="height: 220px; object-fit: cover;" alt="<%= favorite.plant.name %>">
-            <% else %>
-              <div class="d-flex align-items-center justify-content-center" style="height: 220px; background: #f0f4ee;">
-                <span style="font-size: 60px;">🌿</span>
-              </div>
-            <% end %>
+        <div class="plant-card surface-card">
+          <% if favorite.plant.image_url.present? %>
+            <%= image_tag favorite.plant.image_url, class: "plant-card-image", alt: favorite.plant.display_name %>
+          <% else %>
+            <div class="plant-placeholder">Plant</div>
+          <% end %>
 
-            <div class="card-body p-4 d-flex flex-column">
-              <h5 class="card-title mb-3" style="font-weight: 600;"><%= favorite.plant.name %></h5>
+          <div class="plant-card-body">
+            <h2 class="plant-card-title"><%= favorite.plant.display_name %></h2>
+            <%= render "plants/plant_tags", plant: favorite.plant %>
 
-              <div class="d-flex flex-wrap gap-2 mb-4">
-                <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.8rem; padding:6px 12px;">
-                  ☀️ <%= favorite.plant.light_needs %>
-                </span>
-                <span class="badge rounded-pill border" style="color:black; font-weight:400; border-color:black !important; background:transparent; font-size:0.8rem; padding:6px 12px;">
-                  💧 <%= favorite.plant.water_needs %>
-                </span>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center mt-auto">
-                <%= link_to "View Details", plant_path(favorite.plant), class: "btn btn-sm rounded-pill px-3 py-2", style: "background:#4A7C2F; color:white; border:none;" %>
-                <%= link_to favorite_path(favorite),
-                            data: { turbo_method: :delete, turbo_confirm: "Remove from garden?" },
-                            class: "text-decoration-none",
-                            style: "color:#ccc; font-size:1.1rem; transition: color 0.15s;",
-                            onmouseover: "this.style.color='#dc3545'",
-                            onmouseout: "this.style.color='#ccc'" do %>
-                  🗑️
-                <% end %>
-              </div>
+            <div class="plant-actions">
+              <%= link_to "View Details", plant_path(favorite.plant), class: "btn btn-sm btn-success rounded-pill px-3 py-2" %>
+              <%= link_to "Remove",
+                          saved_plant_path(favorite),
+                          data: { turbo_method: :delete, turbo_confirm: "Remove from My Plants?" },
+                          class: "btn btn-sm btn-soft-danger rounded-pill px-3 py-2" %>
             </div>
           </div>
         </div>
@@ -46,13 +36,14 @@
     </div>
 
   <% else %>
-    <div class="d-flex flex-column align-items-center justify-content-center text-center" style="min-height: 50vh;">
-      <div style="font-size: 80px; margin-bottom: 24px;">🪴</div>
-      <h3 style="font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">Your garden is still empty</h3>
-      <p style="color: #858585; font-size: 15px; max-width: 320px; margin-bottom: 32px;">Answer 7 quick questions and we'll find the perfect plant for your space.</p>
-      <%= link_to "Explore the Plant Matchmaker", new_chat_path, class: "btn rounded-pill px-5 py-3", style: "background:#4A7C2F
-; color:white; font-weight:500; font-size:15px;" %>
+    <div class="empty-state surface-card">
+      <div class="empty-state-inner">
+        <h2 class="h4">No saved plants yet</h2>
+        <p class="text-muted mb-4">Answer a few questions and save your favourite plant matches here.</p>
+        <%= link_to "Find a Plant", find_plant_path, class: "btn btn-success rounded-pill px-5 py-3" %>
+      </div>
     </div>
   <% end %>
 
+  </div>
 </div>
