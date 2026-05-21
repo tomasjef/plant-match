@@ -1,17 +1,20 @@
 class PlantAssistant
+  FALLBACK_REPLY = "Sorry, I couldn't answer that just now. Please try again."
+
   def initialize(plant:, chat:)
     @plant = plant
     @chat = chat
   end
 
   def call
-    RubyLLM.chat(model: assistant_model, provider: :openai, assume_model_exists: true)
-           .with_instructions(system_prompt)
-           .ask(user_prompt)
-           .content
+    response = RubyLLM.chat(model: assistant_model, provider: :openai, assume_model_exists: true)
+                    .with_instructions(system_prompt)
+                    .ask(user_prompt)
+
+    normalize_reply(response.content)
   rescue StandardError => e
     Rails.logger.warn("Plant assistant failed: #{e.class} - #{e.message}")
-    "Sorry, I couldn't answer that just now. Please try again."
+    FALLBACK_REPLY
   end
 
   private
@@ -20,6 +23,22 @@ class PlantAssistant
 
   def assistant_model
     ENV["PLANT_ASSISTANT_MODEL"].presence || RubyLLM.config.default_model
+  end
+
+  def normalize_reply(content)
+    text = strip_code_fence(content.to_s.strip)
+
+    return FALLBACK_REPLY if malformed_reply?(text)
+
+    text
+  end
+
+  def strip_code_fence(text)
+    text.sub(/\A```[a-zA-Z0-9_-]*\s*/m, "").sub(/\s*```\z/m, "").strip
+  end
+
+  def malformed_reply?(text)
+    text.blank? || text !~ /[[:alnum:]]/
   end
 
   def system_prompt
