@@ -2,7 +2,6 @@ module Perenual
   class MatchPlants
     PAGE_LIMIT = 2
     DETAIL_LIMIT = 12
-    DETAIL_CACHE_TTL = 7.days
 
     def initialize(params:, client: Client.new)
       @params = params
@@ -10,7 +9,7 @@ module Perenual
     end
 
     def call
-      candidates.first(DETAIL_LIMIT).filter_map { |data| import_with_details(data) }
+      candidates.first(DETAIL_LIMIT).filter_map { |data| import(data) }
     end
 
     private
@@ -38,21 +37,11 @@ module Perenual
       [last_page, PAGE_LIMIT].min
     end
 
-    def import_with_details(data)
-      plant = ImportPlant.new(data).call
-      return plant unless detail_stale?(plant)
-
-      ImportPlant.new(client.species_details(data["id"])).call
+    def import(data)
+      ImportPlant.new(data).call
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("Perenual import skipped: #{e.message}")
       nil
-    rescue StandardError => e
-      Rails.logger.warn("Perenual detail import failed for #{data['id']}: #{e.class} - #{e.message}")
-      plant
-    end
-
-    def detail_stale?(plant)
-      plant.description.blank? || plant.synced_at.blank? || plant.synced_at <= DETAIL_CACHE_TTL.ago
     end
 
     def importable?(data)

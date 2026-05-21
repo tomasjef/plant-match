@@ -34,7 +34,7 @@ module Perenual
     end
 
     def perform_request(uri)
-      Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, read_timeout: TIMEOUT_SECONDS) do |http|
+      Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: TIMEOUT_SECONDS, read_timeout: TIMEOUT_SECONDS) do |http|
         http.get(uri)
       end
     end
