@@ -21,7 +21,7 @@ module Perenual
     def candidates
       pages.flat_map { |page| Array(page["data"]) }
            .select { |data| importable?(data) }
-           .uniq { |data| data["id"] }
+           .uniq { |data| plant_identity(data) }
     end
 
     def pages
@@ -48,6 +48,18 @@ module Perenual
 
     def importable?(data)
       data["id"].present? && image_url(data).present?
+    end
+
+    def plant_identity(data)
+      scientific_name(data).presence || normalized_name(data["common_name"]).presence || data["id"]
+    end
+
+    def scientific_name(data)
+      normalized_name(Array(data["scientific_name"]).first)
+    end
+
+    def normalized_name(name)
+      name.to_s.downcase.gsub(/[^a-z0-9]+/, " ").squish
     end
 
     def image_url(data)
