@@ -5,7 +5,7 @@ class PlantAssistant
   end
 
   def call
-    RubyLLM.chat
+    RubyLLM.chat(model: assistant_model, provider: :openai, assume_model_exists: true)
            .with_instructions(system_prompt)
            .ask(user_prompt)
            .content
@@ -17,6 +17,10 @@ class PlantAssistant
   private
 
   attr_reader :plant, :chat
+
+  def assistant_model
+    ENV["PLANT_ASSISTANT_MODEL"].presence || RubyLLM.config.default_model
+  end
 
   def system_prompt
     <<~PROMPT

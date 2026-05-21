@@ -12,4 +12,8 @@ class Plant < ApplicationRecord
   def display_name
     name.to_s.titleize
   end
+
+  def care_content?
+    description.present? || plant_info.present?
+  end
 end

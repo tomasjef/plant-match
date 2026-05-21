@@ -24,20 +24,20 @@ module Perenual
     def assign_api_fields(plant)
       plant.perenual_id = perenual_id if perenual_id.present?
       plant.name = plant_name
-      plant.scientific_name = scientific_name
-      plant.description = description
+      plant.scientific_name = scientific_name if scientific_name.present?
+      plant.description = description if description.present?
       plant.image_url = display_image_url if display_image_url.present?
       plant.api_image_url = original_image_url if original_image_url.present?
-      plant.api_data = data
+      plant.api_data = plant.api_data.merge(data)
       plant.synced_at = Time.current
     end
 
     def assign_matching_fields(plant)
-      plant.light_needs = map_sunlight(data["sunlight"])
-      plant.water_needs = map_watering(data["watering"])
-      plant.care_level = map_care_level(data["care_level"] || data["maintenance"])
+      plant.light_needs = map_sunlight(data["sunlight"]) if data["sunlight"].present? || plant.light_needs.blank?
+      plant.water_needs = map_watering(data["watering"]) if data["watering"].present? || plant.water_needs.blank?
+      plant.care_level = map_care_level(care_level_data) if care_level_data.present? || plant.care_level.blank?
       plant.indoor_outdoor = "indoor"
-      plant.pet_safe = !truthy?(data["poisonous_to_pets"])
+      plant.pet_safe = !truthy?(data["poisonous_to_pets"]) if data.key?("poisonous_to_pets") || plant.pet_safe.nil?
     end
 
     def perenual_id
@@ -54,6 +54,10 @@ module Perenual
 
     def description
       data["description"].to_s.strip.presence
+    end
+
+    def care_level_data
+      data["care_level"] || data["maintenance"]
     end
 
     def display_image_url

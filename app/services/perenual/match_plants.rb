@@ -9,7 +9,9 @@ module Perenual
     end
 
     def call
-      candidates.first(DETAIL_LIMIT).filter_map { |data| import(data) }
+      candidates.first(DETAIL_LIMIT)
+                .filter_map { |data| import(data) }
+                .select(&:care_content?)
     end
 
     private
