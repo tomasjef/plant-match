@@ -1,1 +1,14 @@
-Rails app generated with [lewagon/rails-templates](https://github.com/lewagon/rails-templates), created by the [Le Wagon coding bootcamp](https://www.lewagon.com) team.
+# Plant Match Maker
+
+Plant Match Maker is a Rails app that helps users find suitable indoor plants based on their space, care habits, and preferences. Users can answer a short questionnaire, view matched plants from the Perenual API, save favourites, and ask plant-specific follow-up questions with an embedded AI assistant.
+
+## Stack
+
+- Ruby on Rails 8
+- PostgreSQL
+- Devise for authentication
+- Bootstrap and SCSS for styling
+- Stimulus for the questionnaire interactions
+- Perenual API for plant data and images
+- RubyLLM for the plant assistant
+- Minitest and RuboCop for testing and linting

@@ -41,3 +41,42 @@
   background-color: #4A7C2F !important;
   color: white !important;
 }
+
+body {
+  background: #f7f9f5;
+  font-weight: 400;
+}
+
+main {
+  min-height: calc(100vh - 64px);
+}
+
+.btn {
+  font-weight: 400;
+}
+
+.btn-sm {
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+.fw-bold,
+.fw-semibold,
+.fw-medium,
+strong,
+b,
+.form-label,
+.dropdown-item {
+  font-weight: 400 !important;
+}

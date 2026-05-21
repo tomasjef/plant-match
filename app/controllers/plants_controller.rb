@@ -2,47 +2,84 @@ class PlantsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show results]
 
   def index
-    @plants = Plant.all
+    @plants = indoor_plants
   end
 
   def results
-    @plants = Plant.all
+    remember_match_params
+    @plants = import_perenual_results
+    score_plants
+  rescue StandardError => e
+    Rails.logger.warn("Perenual search failed: #{e.class} - #{e.message}")
+    @plants = indoor_plants
     score_plants
   end
 
   def show
     @plant = Plant.find(params[:id])
+    @back_to_matches_path = plant_matches_path(session[:plant_match_params] || {})
+    sync_perenual_details(@plant)
 
-    if @plant.plant_info.blank?
-      response = RubyLLM.chat
-                        .with_instructions("You are a plant expert. Be concise but informative, do not use any special characters, do use emoji.")
-                        .ask("For a #{@plant.name} plant, give me:
-        1. Care tips
-        2. A short history of this plant
-        3. A common illness for this plant and the method of treatment")
-                        .content
+    @plant_info = @plant.description.presence ||
+                  "Plant care information is not available yet. Please try again later."
 
-      @plant.update(plant_info: response)
-    end
+    return unless user_signed_in?
 
-    @plant_info = @plant.plant_info
+    @chat = current_user.chats.find_or_create_by!(plant: @plant)
+    @message = Message.new
   end
 
   private
 
+  def indoor_plants
+    Plant.where(indoor_outdoor: %w[indoor both])
+  end
+
+  def perenual_client
+    Perenual::Client.new
+  end
+
+  def import_perenual_results
+    Perenual::MatchPlants.new(params: params).call
+  end
+
+  def remember_match_params
+    session[:plant_match_params] = params.permit(
+      :light_needs,
+      :water_needs,
+      :care_level,
+      :pet_safe
+    ).to_h
+  end
+
+  def sync_perenual_details(plant)
+    return if plant.perenual_id.blank?
+    return if plant.description.present? && plant.synced_at.present? && plant.synced_at > 7.days.ago
+
+    details = perenual_client.species_details(plant.perenual_id)
+    Perenual::ImportPlant.new(details).call
+  rescue StandardError => e
+    Rails.logger.warn("Perenual detail sync failed for plant #{plant.id}: #{e.class} - #{e.message}")
+  end
+
   def score_plants
-    scored_plants = @plants.map do |plant|
-      score = 0
-      score += 1 if plant.light_needs == params[:light_needs]
-      score += 1 if plant.water_needs == params[:water_needs]
-      score += 1 if plant.care_level == params[:care_level]
-      score += 1 if plant.growth_style == params[:growth_style]
-      score += 1 if plant.indoor_outdoor == params[:indoor_outdoor]
-      score += 1 if plant.pet_safe == (params[:pet_safe] == "true")
-      score += 1 if plant.air_purifying == (params[:air_purifying] == "true")
-      { plant: plant, score: score }
-    end
+    scored_plants = @plants.map { |plant| { plant: plant, score: score_for(plant) } }
 
     @plants = scored_plants.sort_by { |item| -item[:score] }.first(6)
+  end
+
+  def score_for(plant)
+    string_criteria = %i[light_needs water_needs care_level]
+    string_score = string_criteria.count do |attribute|
+      params[attribute].present? && plant.public_send(attribute) == params[attribute]
+    end
+
+    string_score + boolean_score_for(plant, :pet_safe)
+  end
+
+  def boolean_score_for(plant, attribute)
+    return 0 unless params[attribute].present?
+
+    plant.public_send(attribute) == (params[attribute] == "true") ? 1 : 0
   end
 end

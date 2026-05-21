@@ -1,16 +1,39 @@
+<div class="app-page">
+  <div class="app-container chat-panel">
+    <%= link_to "← Back to questionnaire", find_plant_path, class: "back-link" %>
 
-<%= link_to "← Back to chats", chats_path %>
-<h2>Let's find your perfect plant 🌿</h2>
+    <div class="page-header">
+      <div>
+        <p class="page-kicker">Plant assistant</p>
+        <h1 class="page-title">Ask About <%= @plant.display_name %></h1>
+        <p class="page-subtitle">Get practical care help based on this plant’s details.</p>
+      </div>
+    </div>
 
-<div id="messages"
-     data-controller="chat"
-     data-chat-target="messages">
-  <%= render @chat.messages %>
-</div>
+    <div id="messages"
+         class="mb-4"
+         data-controller="chat"
+         data-chat-target="messages">
+      <%= render @chat.messages %>
+    </div>
 
-<div id="new_message_container">
-  <%= simple_form_for [@chat, @message] do |f| %>
-    <%= f.input :content, label: false, required: true, placeholder: "Type your answer..." %>
-    <%= f.button :submit, "Send", class: "btn btn-primary" %>
-  <% end %>
+    <div id="new_message_container" class="surface-card p-4">
+      <p class="text-muted small mb-2">Try asking:</p>
+      <div class="suggested-questions">
+        <span class="suggested-question">Which room would suit this plant?</span>
+        <span class="suggested-question">Is this a good trailing or upright plant?</span>
+        <span class="suggested-question">Can this plant help with air quality?</span>
+        <span class="suggested-question">What should I do if the leaves turn yellow?</span>
+      </div>
+
+      <%= simple_form_for @message, url: plant_assistant_messages_path(@plant) do |f| %>
+        <%= f.input :content,
+                    label: "Question",
+                    required: true,
+                    placeholder: "Type your question...",
+                    input_html: { class: "form-control" } %>
+        <%= f.button :submit, "Send", class: "btn btn-success rounded-pill px-4" %>
+      <% end %>
+    </div>
+  </div>
 </div>
