@@ -39,7 +39,9 @@ class PlantAssistant
   end
 
   def strip_repetitive_opening(text)
-    text.sub(/\Aaccording to the provided data,?\s*/i, "").strip.sub(/\A[[:lower:]]/) { |char| char.upcase }
+    text.sub(/\A(?:according to|based on) the (?:provided )?data,?\s*/i, "")
+        .strip
+        .sub(/\A[[:lower:]]/) { |char| char.upcase }
   end
 
   def malformed_reply?(text)
@@ -49,12 +51,14 @@ class PlantAssistant
   def system_prompt
     <<~PROMPT
       You are a helpful houseplant care assistant.
-      Answer using the plant data provided.
+      Use the plant data provided first.
+      If the plant data is incomplete, supplement with general houseplant knowledge that is specific to this plant, its scientific name, or its closest known genus.
       Be practical, concise, and beginner-friendly.
       Start answers directly and naturally.
       Do not begin with phrases like "According to the provided data" or "Based on the data".
-      If the API data does not contain the answer, say so clearly.
-      Do not invent exact facts such as toxicity, watering needs, or light needs.
+      Do not over-explain where the information came from.
+      Do not give exact claims for toxicity, mature size, growth speed, or air-purifying ability unless the plant data or well-established plant knowledge supports them.
+      If you are unsure, give a cautious plant-specific answer and say what to watch for.
     PROMPT
   end
 

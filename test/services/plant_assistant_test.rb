@@ -27,4 +27,18 @@ class PlantAssistantTest < ActiveSupport::TestCase
 
     assert_equal "It grows slowly.", reply
   end
+
+  test "removes based on the data opener" do
+    reply = @assistant.send(:normalize_reply, "Based on the data, Monstera grows quickly.")
+
+    assert_equal "Monstera grows quickly.", reply
+  end
+
+  test "prompt allows general plant knowledge when data is incomplete" do
+    prompt = @assistant.send(:system_prompt)
+
+    assert_includes prompt, "supplement with general houseplant knowledge"
+    assert_includes prompt, "specific to this plant"
+    assert_includes prompt, "Do not over-explain where the information came from."
+  end
 end
