@@ -15,11 +15,7 @@
   <div class="plant-grid">
     <% @plants.each do |plant| %>
       <div class="plant-card surface-card">
-        <% if plant.image_url.present? %>
-          <%= image_tag plant.image_url, class: "plant-card-image", alt: plant.display_name %>
-        <% else %>
-          <div class="plant-placeholder">Plant</div>
-        <% end %>
+        <%= plant_image plant, css_class: "plant-card-image", image_url: plant.image_url %>
 
         <div class="plant-card-body">
           <h2 class="plant-card-title"><%= plant.display_name %></h2>

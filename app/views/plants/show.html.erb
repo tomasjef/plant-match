@@ -8,13 +8,7 @@
     <%# LEFT COLUMN — image + pills %>
     <div class="col-md-5">
       <div class="position-relative">
-        <% if (@plant.api_image_url.presence || @plant.image_url).present? %>
-          <%= image_tag @plant.api_image_url.presence || @plant.image_url, class: "detail-image", alt: @plant.display_name %>
-        <% else %>
-          <div class="plant-placeholder detail-image">
-            Plant
-          </div>
-        <% end %>
+        <%= plant_image @plant, css_class: "detail-image", image_url: @plant.api_image_url.presence || @plant.image_url %>
       </div>
 
       <div class="mt-3">
@@ -37,7 +31,11 @@
           <% end %>
         </div>
 
-        <div class="detail-copy"><%= @plant_info.to_s.strip.presence || "Coming soon..." %></div>
+        <% if @plant_info.present? %>
+          <div class="detail-copy"><%= @plant_info.to_s.strip %></div>
+        <% else %>
+          <p class="detail-empty">Detailed care notes are still being loaded.</p>
+        <% end %>
       </div>
     </div>
 
@@ -45,23 +43,14 @@
       <section class="plant-assistant">
         <% if user_signed_in? %>
           <% quick_questions = [
-            "Growth style?",
-            "Air quality?",
-            "Leaf problems?"
+            "How big will it grow?",
+            "Is it air purifying?",
+            "How fast does it grow?",
+            "Common problems to watch for?"
           ] %>
 
           <div class="plant-assistant-messages">
             <%= render @chat.messages.recent_first %>
-          </div>
-
-          <div class="plant-assistant-prompts">
-            <% quick_questions.each do |question| %>
-              <%= button_to question,
-                            plant_assistant_messages_path(@plant),
-                            method: :post,
-                            params: { message: { content: question } },
-                            class: "plant-assistant-prompt" %>
-            <% end %>
           </div>
 
           <%= simple_form_for @message,
@@ -73,6 +62,16 @@
                         input_html: { class: "plant-assistant-input" } %>
             <%= f.button :submit, "Send", class: "btn btn-success plant-assistant-submit" %>
           <% end %>
+
+          <div class="plant-assistant-prompts">
+            <% quick_questions.each do |question| %>
+              <%= button_to question,
+                            plant_assistant_messages_path(@plant),
+                            method: :post,
+                            params: { message: { content: question } },
+                            class: "plant-assistant-prompt" %>
+            <% end %>
+          </div>
         <% else %>
           <p class="plant-assistant-note">Log in to ask care questions about this plant.</p>
           <%= link_to "Log in to ask",

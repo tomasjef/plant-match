@@ -213,6 +213,12 @@
   border-radius: 8px;
 }
 
+.plant-image-fallback {
+  background: #eef4e6;
+  object-fit: contain !important;
+  padding: 28px;
+}
+
 .plant-detail-content {
   display: flex;
   flex-direction: column;
@@ -237,6 +243,11 @@
   color: #3c4535;
   line-height: 1.7;
   white-space: pre-line;
+}
+
+.detail-empty {
+  color: #68705f;
+  margin: 0;
 }
 
 .plant-assistant {

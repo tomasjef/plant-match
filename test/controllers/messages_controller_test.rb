@@ -44,11 +44,11 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
 
     with_assistant_stub(assistant) do
       assert_difference("@chat.messages.count", 2) do
-        post plant_assistant_messages_url(@plant), params: { message: { content: "Growth style?" } }
+        post plant_assistant_messages_url(@plant), params: { message: { content: "How big will it grow?" } }
       end
     end
 
-    assert_equal "Growth style?", @chat.messages.where(role: "user").last.content
+    assert_equal "How big will it grow?", @chat.messages.where(role: "user").last.content
     assert_equal "Quick reply", @chat.messages.where(role: "assistant").last.content
     assert_redirected_to plant_url(@plant)
   end
