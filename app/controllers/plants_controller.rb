@@ -1,4 +1,6 @@
 class PlantsController < ApplicationController
+  RESULT_LIMIT = 9
+
   skip_before_action :authenticate_user!, only: %i[index show results]
 
   def index
@@ -65,7 +67,18 @@ class PlantsController < ApplicationController
   def score_plants
     scored_plants = @plants.map { |plant| { plant: plant, score: score_for(plant) } }
 
-    @plants = scored_plants.sort_by { |item| -item[:score] }.first(6)
+    @plants = scored_plants
+              .sort_by { |item| -item[:score] }
+              .uniq { |item| plant_identity(item[:plant]) }
+              .first(RESULT_LIMIT)
+  end
+
+  def plant_identity(plant)
+    normalized_name(plant.scientific_name).presence || normalized_name(plant.name)
+  end
+
+  def normalized_name(name)
+    name.to_s.downcase.gsub(/[^a-z0-9]+/, " ").squish
   end
 
   def score_for(plant)

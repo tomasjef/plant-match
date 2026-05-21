@@ -37,6 +37,27 @@ module Perenual
       assert_equal expected_search_params, client.species_list_params.first
     end
 
+    test "deduplicates Perenual candidates by scientific name" do
+      Plant.create!(
+        perenual_id: 98765,
+        name: "Cached Calathea",
+        scientific_name: "Goeppertia orbifolia",
+        light_needs: "bright indirect",
+        water_needs: "moderate",
+        care_level: "medium",
+        indoor_outdoor: "indoor",
+        pet_safe: true,
+        image_url: "https://example.com/cached-calathea.jpg",
+        description: "A cached leafy indoor plant."
+      )
+      client = DuplicatePerenualClient.new
+
+      plants = MatchPlants.new(params: match_params, client: client).call
+
+      assert_equal 1, plants.size
+      assert_equal [98765], plants.map(&:perenual_id)
+    end
+
     private
 
     def match_params
@@ -108,6 +129,20 @@ module Perenual
           "care_level" => "Medium",
           "poisonous_to_pets" => false
         )
+      end
+    end
+
+    class DuplicatePerenualClient < FakePerenualClient
+      def species_list(params = {})
+        species_list_params << params
+
+        {
+          "data" => [
+            plant_with_image.merge("id" => 98765),
+            plant_with_image.merge("id" => 11111, "common_name" => "Calathea Orbifolia Duplicate")
+          ],
+          "last_page" => 1
+        }
       end
     end
   end
