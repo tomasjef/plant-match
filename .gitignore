@@ -41,3 +41,7 @@
 *.swp
 .DS_Store
 .env*
+
+# Local database backups (contains real data, never commit).
+/backups/*
+!/backups/.keep
