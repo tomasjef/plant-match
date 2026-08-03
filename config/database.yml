@@ -84,16 +84,19 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+<%
+  production_database_url = ENV.fetch("NEON_DATABASE_URL") { ENV["DATABASE_URL"] }
+%>
 production:
   primary:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= production_database_url %>
   cache:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= production_database_url %>
   queue:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= production_database_url %>
   cable:
     <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
+    url: <%= production_database_url %>
