@@ -98,7 +98,37 @@ module Perenual
       assert_equal [98765], plants.map(&:perenual_id)
     end
 
+    test "asks for the second page only when the first has too few plants" do
+      few = PagedPerenualClient.new(per_page: 3)
+      MatchPlants.new(params: match_params, client: few).call
+      assert_equal [1, 2], few.species_list_params.map { |params| params[:page] }
+
+      enough = PagedPerenualClient.new(per_page: 12)
+      MatchPlants.new(params: match_params, client: enough).call
+      assert_equal [1], enough.species_list_params.map { |params| params[:page] }
+    end
+
+    test "repeats of a search come from the cache without asking Perenual" do
+      with_memory_cache do
+        MatchPlants.new(params: match_params, client: FakePerenualClient.new).call
+        repeat = FakePerenualClient.new
+
+        plants = MatchPlants.new(params: match_params, client: repeat).call
+
+        assert_equal ["Calathea Orbifolia"], plants.map(&:name)
+        assert_empty repeat.species_list_params
+      end
+    end
+
     private
+
+    def with_memory_cache
+      original = Rails.cache
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+      yield
+    ensure
+      Rails.cache = original
+    end
 
     def match_params
       {
@@ -169,6 +199,26 @@ module Perenual
           "care_level" => "Medium",
           "poisonous_to_pets" => false
         )
+      end
+    end
+
+    class PagedPerenualClient < FakePerenualClient
+      def initialize(per_page:)
+        super()
+        @per_page = per_page
+      end
+
+      def species_list(params = {})
+        species_list_params << params
+        first_id = params[:page] * 100
+
+        {
+          "data" => Array.new(@per_page) do |index|
+            plant_with_image.merge("id" => first_id + index, "common_name" => "Plant #{first_id + index}",
+                                   "scientific_name" => ["Species #{first_id + index}"])
+          end,
+          "last_page" => 5
+        }
       end
     end
 

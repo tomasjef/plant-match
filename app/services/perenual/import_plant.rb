@@ -10,6 +10,7 @@ module Perenual
         assign_api_fields(plant)
         assign_matching_fields(plant)
         plant.save!
+        StorePlantImageJob.perform_later(plant.id) if ImageStore.configured? && plant.stored_image_url.blank?
       end
     end
 

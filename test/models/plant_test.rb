@@ -41,6 +41,27 @@ class PlantTest < ActiveSupport::TestCase
     assert_equal [displayable], Plant.displayable.to_a
   end
 
+  test "signed Perenual image links expire" do
+    link = lambda do |signed_at|
+      "https://s3.example.com/plant.jpg?X-Amz-Date=#{signed_at.utc.strftime('%Y%m%dT%H%M%SZ')}&X-Amz-Expires=86400"
+    end
+
+    assert Plant.expired_link?(link.call(25.hours.ago))
+    assert Plant.expired_link?(link.call(23.5.hours.ago)), "under an hour left counts as expired"
+    assert_not Plant.expired_link?(link.call(1.hour.ago))
+    assert_not Plant.expired_link?("https://res.cloudinary.com/demo/image/upload/plant.jpg")
+  end
+
+  test "a plant with a stored photo copy no longer needs fresh links" do
+    expired = "https://s3.example.com/plant.jpg?X-Amz-Date=20200101T000000Z&X-Amz-Expires=86400"
+    plant = Plant.new(perenual_id: 1, description: "Care notes", synced_at: Time.current, image_url: expired)
+
+    assert plant.needs_details?
+
+    plant.stored_image_url = "https://res.cloudinary.com/demo/image/upload/plant.jpg"
+    assert_not plant.needs_details?
+  end
+
   test "displayable scope treats whitespace content as empty" do
     Plant.create!(
       name: "Whitespace Fern",

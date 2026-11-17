@@ -4,7 +4,9 @@ require "json"
 module Perenual
   class Client
     BASE_URL = "https://perenual.com/api/v2"
-    TIMEOUT_SECONDS = 8
+    # Connecting is quick when Perenual is up; its answers can take 4 to 10 seconds.
+    OPEN_TIMEOUT_SECONDS = 3
+    READ_TIMEOUT_SECONDS = 10
 
     def initialize(api_key: ENV.fetch("PERENUAL_API_KEY"))
       @api_key = api_key
@@ -34,7 +36,9 @@ module Perenual
     end
 
     def perform_request(uri)
-      Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: TIMEOUT_SECONDS, read_timeout: TIMEOUT_SECONDS) do |http|
+      Net::HTTP.start(uri.hostname, uri.port, use_ssl: true,
+                                              open_timeout: OPEN_TIMEOUT_SECONDS,
+                                              read_timeout: READ_TIMEOUT_SECONDS) do |http|
         http.get(uri)
       end
     end

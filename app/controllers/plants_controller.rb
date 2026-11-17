@@ -1,7 +1,7 @@
 class PlantsController < ApplicationController
   RESULT_LIMIT = 9
 
-  skip_before_action :authenticate_user!, only: %i[index show results]
+  skip_before_action :authenticate_user!, only: %i[index show details results]
 
   def index
     @plants = indoor_plants
@@ -14,17 +14,22 @@ class PlantsController < ApplicationController
     score_plants
   end
 
+  # Missing or stale Perenual details load into the page afterwards (see details)
   def show
     @plant = Plant.find(params[:id])
     @back_to_matches_path = plant_matches_path(session[:plant_match_params] || {})
-    sync_perenual_details(@plant)
-
-    @plant_info = @plant.description.presence || @plant.plant_info.presence
 
     return unless user_signed_in?
 
     @chat = current_user.chats.find_or_create_by!(plant: @plant)
     @message = Message.new
+  end
+
+  def details
+    @plant = Plant.find(params[:id])
+    sync_perenual_details(@plant)
+
+    render partial: "plants/details", locals: { plant: @plant, fetch_details: false }
   end
 
   private
@@ -54,11 +59,11 @@ class PlantsController < ApplicationController
   end
 
   def sync_perenual_details(plant)
-    return if plant.perenual_id.blank?
-    return if plant.description.present? && plant.synced_at.present? && plant.synced_at > 7.days.ago
+    return unless plant.needs_details?
 
     details = perenual_client.species_details(plant.perenual_id)
     Perenual::ImportPlant.new(details).call
+    plant.reload
   rescue StandardError => e
     Rails.logger.warn("Perenual detail sync failed for plant #{plant.id}: #{e.class} - #{e.message}")
   end

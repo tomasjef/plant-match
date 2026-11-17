@@ -46,6 +46,35 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
     assert_select "body", text: /Plant care information is not available/, count: 0
   end
 
+  test "show loads missing Perenual details after the page instead of waiting for them" do
+    @plant.update!(perenual_id: 4242, description: nil)
+
+    get plant_url(@plant)
+
+    assert_response :success
+    assert_select "turbo-frame#plant_details[src=?]", plant_details_path(@plant)
+    assert_select ".detail-empty"
+  end
+
+  test "show needs no extra load when details are fresh" do
+    @plant.update!(perenual_id: 4242, synced_at: Time.current)
+
+    get plant_url(@plant)
+
+    assert_select "turbo-frame#plant_details"
+    assert_select "turbo-frame#plant_details[src]", false
+  end
+
+  test "details renders the frame with what is known when Perenual is unavailable" do
+    @plant.update!(perenual_id: 4242, description: nil)
+
+    get plant_details_url(@plant)
+
+    assert_response :success
+    assert_select "turbo-frame#plant_details[src]", false
+    assert_select ".page-title", text: "Test Fern"
+  end
+
   test "should get results" do
     get plant_matches_url, params: {
       light_needs: "low",

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_20_161819) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_093948) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_20_161819) do
     t.boolean "pet_safe"
     t.text "plant_info"
     t.string "scientific_name"
+    t.string "stored_image_url"
     t.datetime "synced_at"
     t.datetime "updated_at", null: false
     t.string "water_needs"

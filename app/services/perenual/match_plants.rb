@@ -2,40 +2,56 @@ module Perenual
   class MatchPlants
     PAGE_LIMIT = 2
     DETAIL_LIMIT = 12
+    # Under a day, so the image links saved with the plants are still valid
+    CACHE_TTL = 12.hours
 
-    def initialize(params:, client: Client.new)
+    def initialize(params:, client: nil)
       @params = params
       @client = client
     end
 
     # The search list has no descriptions; a plant's page fetches its details when opened.
     def call
-      candidates.first(DETAIL_LIMIT).filter_map { |data| import(data) }
+      cached_plants || search
     end
 
     private
 
-    attr_reader :params, :client
+    attr_reader :params
 
+    def client
+      @client ||= Client.new
+    end
+
+    def search
+      plants = candidates.first(DETAIL_LIMIT).filter_map { |data| import(data) }
+      Rails.cache.write(cache_key, plants.map(&:id), expires_in: CACHE_TTL) if plants.any?
+      plants
+    end
+
+    def cached_plants
+      ids = Rails.cache.read(cache_key)
+      return if ids.blank?
+
+      Plant.where(id: ids).in_order_of(:id, ids).to_a.presence
+    end
+
+    def cache_key
+      ["perenual-matches", search_params, matched_answers.compact]
+    end
+
+    # Each Perenual page is a slow request, so stop once there are enough plants
     def candidates
-      pages.flat_map { |page| Array(page["data"]) }
-           .select { |data| importable?(data) }
-           .uniq { |data| plant_identity(data) }
-    end
+      found = []
 
-    def pages
-      first_page = client.species_list(search_params.merge(page: 1))
-
-      [first_page] + (2..page_count(first_page)).map do |page|
-        client.species_list(search_params.merge(page: page))
+      (1..PAGE_LIMIT).each do |page|
+        response = client.species_list(search_params.merge(page: page))
+        found = (found + Array(response["data"]).select { |data| importable?(data) })
+                .uniq { |data| plant_identity(data) }
+        break if found.size >= DETAIL_LIMIT || page >= response["last_page"].to_i
       end
-    end
 
-    def page_count(response)
-      last_page = response["last_page"].to_i
-      last_page = 1 if last_page < 1
-
-      [last_page, PAGE_LIMIT].min
+      found
     end
 
     def import(data)

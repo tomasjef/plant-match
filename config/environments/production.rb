@@ -49,8 +49,9 @@ Rails.application.configure do
   # Replace the default in-process memory cache store with a durable alternative.
   config.cache_store = :solid_cache_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
+  # Jobs (photo copies) run inside the web process: the Eco dyno has no worker and little memory.
+  # A job lost in a restart is redone the next time its plant is imported.
+  config.active_job.queue_adapter = :async
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Ignore bad email addresses and do not raise email delivery errors.

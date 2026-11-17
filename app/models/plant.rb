@@ -14,8 +14,30 @@ class Plant < ApplicationRecord
       .where("NULLIF(TRIM(description), '') IS NOT NULL OR NULLIF(TRIM(plant_info), '') IS NOT NULL")
   }
 
+  DETAILS_TTL = 7.days
+
+  # Perenual's image links are signed and stop working after X-Amz-Expires seconds
+  def self.expired_link?(url, margin: 1.hour)
+    query = Rack::Utils.parse_query(URI(url.to_s).query.to_s)
+    return false if query["X-Amz-Date"].blank? || query["X-Amz-Expires"].blank?
+
+    Time.parse(query["X-Amz-Date"]) + query["X-Amz-Expires"].to_i.seconds < margin.from_now
+  rescue ArgumentError, URI::InvalidURIError
+    false
+  end
+
   def display_name
     name.to_s.titleize
+  end
+
+  def needs_details?
+    return false if perenual_id.blank?
+
+    description.blank? || synced_at.blank? || synced_at <= DETAILS_TTL.ago || image_expired?
+  end
+
+  def image_expired?
+    stored_image_url.blank? && self.class.expired_link?(api_image_url.presence || image_url)
   end
 
   def displayable?

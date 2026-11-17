@@ -2,6 +2,8 @@ require "test_helper"
 
 module Perenual
   class ImportPlantTest < ActiveSupport::TestCase
+    include ActiveJob::TestHelper
+
     test "imports Perenual fields into a local plant" do
       plant = ImportPlant.new(perenual_data).call
 
@@ -44,7 +46,29 @@ module Perenual
       assert_equal "Detailed care content.", plant.api_data["description"]
     end
 
+    test "queues a photo copy when Cloudinary is set up" do
+      with_env("CLOUDINARY_URL" => "cloudinary://key:secret@demo") do
+        plant = nil
+        assert_enqueued_jobs(1, only: StorePlantImageJob) { plant = ImportPlant.new(perenual_data).call }
+        assert_enqueued_with(job: StorePlantImageJob, args: [plant.id])
+      end
+    end
+
+    test "queues nothing without Cloudinary" do
+      with_env("CLOUDINARY_URL" => nil) do
+        assert_no_enqueued_jobs { ImportPlant.new(perenual_data).call }
+      end
+    end
+
     private
+
+    def with_env(values)
+      original = values.keys.index_with { |key| ENV.fetch(key, nil) }
+      values.each { |key, value| ENV[key] = value }
+      yield
+    ensure
+      original.each { |key, value| ENV[key] = value }
+    end
 
     def perenual_data
       {

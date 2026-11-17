@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
   get "browse-plants", to: "plants#index", as: :browse_plants
   get "plants/:id", to: "plants#show", as: :plant
+  get "plants/:id/details", to: "plants#details", as: :plant_details
   post "plants/:plant_id/save", to: "favorites#create", as: :save_plant
 
   get "my-plants", to: "favorites#index", as: :my_plants

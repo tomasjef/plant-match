@@ -1,6 +1,7 @@
 module ApplicationHelper
   def plant_image(plant, css_class:, image_url: nil)
-    source = image_url.presence || plant.api_image_url.presence || plant.image_url.presence
+    stored = ImageStore.display_url(plant.stored_image_url) if plant.stored_image_url.present?
+    source = stored || image_url.presence || plant.api_image_url.presence || plant.image_url.presence
     return plant_placeholder(css_class) if source.blank?
 
     image_tag source,
