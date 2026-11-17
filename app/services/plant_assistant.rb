@@ -71,7 +71,7 @@ class PlantAssistant
       Light: #{plant.light_needs}
       Water: #{plant.water_needs}
       Care level: #{plant.care_level}
-      Pet safe: #{plant.pet_safe ? 'yes' : 'no'}
+      Pet safe: #{{ true => 'yes', false => 'no' }.fetch(plant.pet_safe, 'unknown')}
       API data: #{plant.api_data}
 
       Conversation so far:

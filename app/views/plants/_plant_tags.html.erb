@@ -15,5 +15,7 @@
     <span class="plant-tag">🏠 indoor</span>
   <% end %>
 
-  <span class="plant-tag"><%= plant.pet_safe ? "✅ pet safe" : "❌ not pet safe" %></span>
+  <% unless plant.pet_safe.nil? %>
+    <span class="plant-tag"><%= plant.pet_safe ? "✅ pet safe" : "❌ not pet safe" %></span>
+  <% end %>
 </div>

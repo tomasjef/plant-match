@@ -7,13 +7,10 @@ class PlantsController < ApplicationController
     @plants = indoor_plants
   end
 
+  # Perenual's matches first, topped up with the best saved plants
   def results
     remember_match_params
-    @plants = import_perenual_results
-    score_plants
-  rescue StandardError => e
-    Rails.logger.warn("Perenual search failed: #{e.class} - #{e.message}")
-    @plants = indoor_plants
+    @plants = perenual_matches + indoor_plants.to_a
     score_plants
   end
 
@@ -40,8 +37,11 @@ class PlantsController < ApplicationController
     Perenual::Client.new
   end
 
-  def import_perenual_results
+  def perenual_matches
     Perenual::MatchPlants.new(params: params).call
+  rescue StandardError => e
+    Rails.logger.warn("Perenual search failed: #{e.class} - #{e.message}")
+    []
   end
 
   def remember_match_params
@@ -64,11 +64,12 @@ class PlantsController < ApplicationController
   end
 
   def score_plants
-    scored_plants = @plants.select(&:displayable?)
-                           .map { |plant| { plant: plant, score: score_for(plant) } }
+    scored_plants = @plants.each_with_index.map do |plant, index|
+      { plant: plant, score: score_for(plant), index: index }
+    end
 
     @plants = scored_plants
-              .sort_by { |item| -item[:score] }
+              .sort_by { |item| [-item[:score], item[:index]] }
               .uniq { |item| plant_identity(item[:plant]) }
               .first(RESULT_LIMIT)
   end

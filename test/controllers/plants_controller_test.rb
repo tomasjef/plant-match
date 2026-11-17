@@ -114,6 +114,33 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".plant-card", text: /Empty Result Plant/, count: 0
   end
 
+  test "results show Perenual matches before their details arrive, topped up with saved plants" do
+    new_match = Plant.create!(
+      perenual_id: 4242,
+      name: "Fresh Match",
+      light_needs: "low",
+      water_needs: "moderate",
+      care_level: "easy",
+      indoor_outdoor: "indoor",
+      image_url: "https://example.com/fresh-match.jpg"
+    )
+
+    with_perenual_matches([new_match]) do
+      get plant_matches_url, params: {
+        light_needs: "low",
+        water_needs: "moderate",
+        care_level: "easy",
+        pet_safe: "false"
+      }
+    end
+
+    assert_response :success
+    assert_select ".plant-card", 2
+    assert_select ".plant-card:first-child", text: /Fresh Match/
+    assert_select ".plant-card:first-child .plant-tag", text: /pet safe/, count: 0
+    assert_select ".plant-card", text: /Test Fern/
+  end
+
   test "results deduplicate plants by scientific name" do
     @plant.update!(scientific_name: "Nephrolepis exaltata")
     Plant.create!(
@@ -143,14 +170,27 @@ class PlantsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def with_perenual_failure
-    original_new = Perenual::MatchPlants.method(:new)
+  def with_perenual_failure(&)
     failing_service = Class.new do
       def call
         raise "Perenual unavailable"
       end
     end.new
-    Perenual::MatchPlants.define_singleton_method(:new) { |**| failing_service }
+
+    with_match_service(failing_service, &)
+  end
+
+  def with_perenual_matches(plants, &)
+    service = Struct.new(:plants) do
+      def call = plants
+    end.new(plants)
+
+    with_match_service(service, &)
+  end
+
+  def with_match_service(service)
+    original_new = Perenual::MatchPlants.method(:new)
+    Perenual::MatchPlants.define_singleton_method(:new) { |**| service }
 
     yield
   ensure

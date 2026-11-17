@@ -8,10 +8,9 @@ module Perenual
       @client = client
     end
 
+    # The search list has no descriptions; a plant's page fetches its details when opened.
     def call
-      candidates.first(DETAIL_LIMIT)
-                .filter_map { |data| import(data) }
-                .select(&:displayable?)
+      candidates.first(DETAIL_LIMIT).filter_map { |data| import(data) }
     end
 
     private
@@ -40,7 +39,7 @@ module Perenual
     end
 
     def import(data)
-      ImportPlant.new(data).call
+      ImportPlant.new(data, answers: matched_answers).call
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("Perenual import skipped: #{e.message}")
       nil
@@ -75,6 +74,15 @@ module Perenual
         sunlight: sunlight_filter,
         poisonous: poisonous_filter
       }.compact
+    end
+
+    # Answers Perenual filtered on, so every plant it returns has them
+    def matched_answers
+      {
+        light_needs: (params[:light_needs] if sunlight_filter),
+        water_needs: (params[:water_needs] if watering_filter),
+        pet_safe: (true if poisonous_filter)
+      }
     end
 
     def watering_filter

@@ -1,7 +1,8 @@
 module Perenual
   class ImportPlant
-    def initialize(data)
+    def initialize(data, answers: {})
       @data = data
+      @answers = answers
     end
 
     def call
@@ -14,7 +15,7 @@ module Perenual
 
     private
 
-    attr_reader :data
+    attr_reader :data, :answers
 
     def find_plant
       Plant.find_by(perenual_id: perenual_id) ||
@@ -33,11 +34,30 @@ module Perenual
     end
 
     def assign_matching_fields(plant)
-      plant.light_needs = map_sunlight(data["sunlight"]) if data["sunlight"].present? || plant.light_needs.blank?
-      plant.water_needs = map_watering(data["watering"]) if data["watering"].present? || plant.water_needs.blank?
+      unconfirmed = plant.description.blank?
+
+      plant.light_needs = need(plant, :light_needs, data["sunlight"], unconfirmed) { |value| map_sunlight(value) }
+      plant.water_needs = need(plant, :water_needs, data["watering"], unconfirmed) { |value| map_watering(value) }
       plant.care_level = map_care_level(care_level_data) if care_level_data.present? || plant.care_level.blank?
       plant.indoor_outdoor = "indoor"
-      plant.pet_safe = !truthy?(data["poisonous_to_pets"]) if data.key?("poisonous_to_pets") || plant.pet_safe.nil?
+      plant.pet_safe = pet_safe(plant, unconfirmed)
+    end
+
+    # Search results leave out most care fields. Until a plant's details arrive,
+    # use the answers the search matched it on.
+    def need(plant, attribute, api_value, unconfirmed)
+      return yield(api_value) if api_value.present?
+      return answers[attribute] if unconfirmed && answers[attribute].present?
+
+      plant.public_send(attribute).presence || yield(nil)
+    end
+
+    # nil means not known yet, so the page makes no claim either way
+    def pet_safe(plant, unconfirmed)
+      return !truthy?(data["poisonous_to_pets"]) if data.key?("poisonous_to_pets")
+      return answers[:pet_safe] if unconfirmed
+
+      plant.pet_safe
     end
 
     def perenual_id

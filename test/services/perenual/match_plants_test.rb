@@ -2,14 +2,54 @@ require "test_helper"
 
 module Perenual
   class MatchPlantsTest < ActiveSupport::TestCase
-    test "searches Perenual without fetching details and skips plants with no care content" do
+    test "searches Perenual without fetching details and keeps plants that have an image" do
       client = FakePerenualClient.new
 
       plants = MatchPlants.new(params: match_params, client: client).call
 
-      assert_empty plants
+      assert_equal ["Calathea Orbifolia"], plants.map(&:name)
+      assert_nil plants.first.description
       assert_empty client.detail_ids
       assert_equal expected_search_params, client.species_list_params.first
+    end
+
+    test "plants from the search list take the answers Perenual matched on" do
+      client = ListOnlyPerenualClient.new
+
+      plant = MatchPlants.new(params: match_params.merge(light_needs: "low", water_needs: "low"), client: client).call.first
+
+      assert_equal "low", plant.light_needs
+      assert_equal "low", plant.water_needs
+      assert_equal true, plant.pet_safe
+    end
+
+    test "pet safety stays unknown when the search did not filter on it" do
+      client = ListOnlyPerenualClient.new
+
+      plant = MatchPlants.new(params: match_params.merge(pet_safe: "false"), client: client).call.first
+
+      assert_nil plant.pet_safe
+      assert_nil client.species_list_params.first[:poisonous]
+    end
+
+    test "fetched details win over search answers" do
+      Plant.create!(
+        perenual_id: 98765,
+        name: "Calathea Orbifolia",
+        light_needs: "direct sun",
+        water_needs: "high",
+        care_level: "advanced",
+        indoor_outdoor: "indoor",
+        pet_safe: false,
+        image_url: "https://example.com/calathea.jpg",
+        description: "Details from Perenual."
+      )
+
+      plant = MatchPlants.new(params: match_params, client: ListOnlyPerenualClient.new).call.first
+
+      assert_equal "direct sun", plant.light_needs
+      assert_equal "high", plant.water_needs
+      assert_equal false, plant.pet_safe
     end
 
     test "keeps matches that already have cached care content" do
@@ -129,6 +169,18 @@ module Perenual
           "care_level" => "Medium",
           "poisonous_to_pets" => false
         )
+      end
+    end
+
+    # A search list entry with no care fields
+    class ListOnlyPerenualClient < FakePerenualClient
+      def species_list(params = {})
+        species_list_params << params
+
+        {
+          "data" => [plant_with_image.except("sunlight", "watering")],
+          "last_page" => 1
+        }
       end
     end
 
