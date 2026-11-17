@@ -12,9 +12,16 @@ class Plant < ApplicationRecord
   scope :displayable, lambda {
     where("NULLIF(TRIM(image_url), '') IS NOT NULL")
       .where("NULLIF(TRIM(description), '') IS NOT NULL OR NULLIF(TRIM(plant_info), '') IS NOT NULL")
+      .where.not("image_url LIKE ?", "%#{LOCKED_IMAGE}%")
   }
 
   DETAILS_TTL = 7.days
+  # Perenual's image for species outside the API plan (on the free plan, ids above 3000)
+  LOCKED_IMAGE = "upgrade_access".freeze
+
+  def self.locked_image?(url)
+    url.to_s.include?(LOCKED_IMAGE)
+  end
 
   # Perenual's image links are signed and stop working after X-Amz-Expires seconds
   def self.expired_link?(url, margin: 1.hour)
@@ -30,8 +37,12 @@ class Plant < ApplicationRecord
     name.to_s.titleize
   end
 
+  def locked?
+    self.class.locked_image?(image_url) || self.class.locked_image?(api_image_url)
+  end
+
   def needs_details?
-    return false if perenual_id.blank?
+    return false if perenual_id.blank? || locked?
 
     description.blank? || synced_at.blank? || synced_at <= DETAILS_TTL.ago || image_expired?
   end

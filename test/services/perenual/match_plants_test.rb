@@ -13,6 +13,18 @@ module Perenual
       assert_equal expected_search_params, client.species_list_params.first
     end
 
+    test "skips plants locked to paid Perenual plans" do
+      client = FakePerenualClient.new
+      locked = { "id" => 8387, "common_name" => "Zz Plant",
+                 "default_image" => { "regular_url" => "https://s3.example.com/perenual/image/upgrade_access.jpg" } }
+      client.define_singleton_method(:species_list) do |params = {}|
+        species_list_params << params
+        { "data" => [locked], "last_page" => 1 }
+      end
+
+      assert_empty MatchPlants.new(params: match_params, client: client).call
+    end
+
     test "plants from the search list take the answers Perenual matched on" do
       client = ListOnlyPerenualClient.new
 

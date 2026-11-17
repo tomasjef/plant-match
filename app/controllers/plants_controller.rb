@@ -69,7 +69,7 @@ class PlantsController < ApplicationController
   end
 
   def score_plants
-    scored_plants = @plants.each_with_index.map do |plant, index|
+    scored_plants = @plants.reject(&:locked?).each_with_index.map do |plant, index|
       { plant: plant, score: score_for(plant), index: index }
     end
 

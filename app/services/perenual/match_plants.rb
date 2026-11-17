@@ -66,7 +66,7 @@ module Perenual
     end
 
     def importable?(data)
-      data["id"].present? && image_url(data).present?
+      data["id"].present? && image_url(data).present? && !Plant.locked_image?(image_url(data))
     end
 
     def plant_identity(data)

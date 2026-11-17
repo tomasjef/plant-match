@@ -62,6 +62,23 @@ class PlantTest < ActiveSupport::TestCase
     assert_not plant.needs_details?
   end
 
+  test "plants Perenual locks to paid plans are hidden and never fetch details" do
+    locked = Plant.create!(
+      perenual_id: 8387,
+      name: "Zz Plant",
+      light_needs: "low",
+      water_needs: "low",
+      care_level: "easy",
+      indoor_outdoor: "indoor",
+      image_url: "https://s3.example.com/perenual/image/upgrade_access.jpg?X-Amz-Date=20200101T000000Z",
+      description: "Care notes"
+    )
+
+    assert locked.locked?
+    assert_not locked.needs_details?
+    assert_empty Plant.displayable.to_a
+  end
+
   test "displayable scope treats whitespace content as empty" do
     Plant.create!(
       name: "Whitespace Fern",
