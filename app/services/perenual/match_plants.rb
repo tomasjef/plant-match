@@ -2,6 +2,7 @@ module Perenual
   class MatchPlants
     PAGE_LIMIT = 2
     DETAIL_LIMIT = 12
+    NEXT_PAGE_BUDGET_SECONDS = 7
     # Under a day, so the image links saved with the plants are still valid
     CACHE_TTL = 12.hours
 
@@ -40,15 +41,18 @@ module Perenual
       ["perenual-matches", search_params, matched_answers.compact]
     end
 
-    # Each Perenual page is a slow request, so stop once there are enough plants
+    # Each Perenual page is a slow request, so stop once there are enough plants,
+    # or when another page could push the search past Heroku's 30 second limit
     def candidates
       found = []
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       (1..PAGE_LIMIT).each do |page|
         response = client.species_list(search_params.merge(page: page))
         found = (found + Array(response["data"]).select { |data| importable?(data) })
                 .uniq { |data| plant_identity(data) }
         break if found.size >= DETAIL_LIMIT || page >= response["last_page"].to_i
+        break if Process.clock_gettime(Process::CLOCK_MONOTONIC) - started > NEXT_PAGE_BUDGET_SECONDS
       end
 
       found

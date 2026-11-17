@@ -4,8 +4,9 @@ require "json"
 module Perenual
   class Client
     BASE_URL = "https://perenual.com/api/v2"
-    # Connecting is quick when Perenual is up; its answers can take 4 to 10 seconds.
-    OPEN_TIMEOUT_SECONDS = 3
+    # Perenual's HTTPS setup alone takes 4 to 8 seconds (measured from Heroku, Nov 2026),
+    # and it closes the connection after every answer, so each request pays it.
+    OPEN_TIMEOUT_SECONDS = 10
     READ_TIMEOUT_SECONDS = 10
 
     def initialize(api_key: ENV.fetch("PERENUAL_API_KEY"))
